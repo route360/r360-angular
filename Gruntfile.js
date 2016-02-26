@@ -47,12 +47,13 @@ module.exports = function(grunt) {
 					browser:        true,
 					devel:          true,
 					globals: {
-						angular:    false,
-						$:          false,
-						moment:		false,
-						Pikaday: false,
-						module: false,
-						forge: false
+						angular : false,
+						$       : false,
+						moment  : false,
+						Pikaday : false,
+						module  : false,
+						forge   : false,
+						r360    : false
 					}
 				},
 				beforeconcat:   {
@@ -81,8 +82,8 @@ module.exports = function(grunt) {
 				},
 				build: {
 					files:  {},
-					src:    's.js',
-					dest:   's.min.js'
+					src:    'r360-angular.js',
+					dest:   'r360-angular.min.js'
 				}
 			}/*,
 			karma: {
@@ -93,15 +94,15 @@ module.exports = function(grunt) {
 				}
 			}*/
 		});
-		
-		
+
+
 		/**
 		register/define grunt tasks
 		@toc 6.
 		*/
 		// Default task(s).
 		grunt.registerTask('default', ['jshint:beforeconcatQ', 'uglify:build']);
-	
+
 	}
 	init({});		//initialize here for defaults (init may be called again later within a task)
 

@@ -25,7 +25,7 @@ config(['$routeProvider', '$locationProvider', '$compileProvider', function($rou
 	var pagesPath =staticPath+'pages/';
 
 
-	$routeProvider.when(appPathRoute+'home', {templateUrl: pagesPath+'home/home.html'});
+	$routeProvider.when(appPathRoute+'home', {templateUrl: pagesPath+'home/home.html',controller: 'HomeCtrl as map'});
 
 	$routeProvider.otherwise({redirectTo: appPathRoute+'home'});
 
