@@ -1,9 +1,9 @@
 /**
-@fileOverview
-
-@toc
-
-*/
+ * Route 360 for Angular
+ * https://github.com/route360/r360-angular
+ * @license MIT
+ * v0.0.1
+ */
 
 'use strict';
 
@@ -49,7 +49,7 @@ angular.module('ng360', [])
             endpoint             : 'brandenburg',
 
             normalizeLatLng      : normalizeLatLng,
-            getColorRange        : getColorRange,
+            getColorRangeArray   : getColorRangeArray,
             reverseGeocode       : reverseGeocode,
             geocode              : geocode,
             getTravelOptions     : getTravelOptions,
@@ -166,11 +166,12 @@ angular.module('ng360', [])
         r360.config.serviceKey = self.serviceKey;
         r360.config.i18n.language = "de";
 
-        var layerGroups = undefined;
+        var layerGroups, lastRelatedTarget;
+        var attribution = "<a href='https://cartodb.com/' target='_blank'>© CartoDB</a> | <a href='https://www.openstreetmaps.com/' target='_blank'>© OpenStreetMap</a> | © Transit Data <a href='https://ruter.no' target='_blank'>Ruter</a>, <a href='https://www.kolumbus.no/en/' target='_blank'>Kolumbus</a> | developed by <a href='https://www.route360.net/?lang=en' target='_blank'>Motion Intelligence</a>";
 
         function init(map) {
             layerGroups = {
-                tileLayer: L.tileLayer(vm.options.mapstyle, {maxZoom: 18,attribution: attribution}).addTo(map),
+                tileLayer: L.tileLayer(self.mapstyle, {maxZoom: 18,attribution: attribution}).addTo(map),
                 // populationDensityLayer: L.tileLayer.wms("https://service.route360.net/geoserver/wms?service=WMS&TILED=true", {
                 //     layers: 'bevoelkerungsdichte_berlin_brandenburg:brandenburg_pop_density',
                 //     format: 'image/png',
@@ -181,8 +182,11 @@ angular.module('ng360', [])
                 routeLayerGroup: L.featureGroup().addTo(map),
                 reachableLayerGroup: L.featureGroup().addTo(map),
                 tempLayerGroup: L.featureGroup().addTo(map),
-                polygonLayerGroup: r360.leafletPolygonLayer({extendWidthX: vm.options.extendWidth, extendWidthY: vm.options.extendWidth}).addTo(map)
+                polygonLayerGroup: r360.leafletPolygonLayer({extendWidthX: self.extendWidth, extendWidthY: self.extendWidth}).addTo(map)
             };
+            map.on("contextmenu.show", function(e) {
+                lastRelatedTarget = e.relatedTarget;
+            });
         }
 
         /**
@@ -464,7 +468,7 @@ angular.module('ng360', [])
                     case "targets":
                         break;
                     default:
-                        showToast('Parameter not valid');
+                        console.log('Parameter not valid');
                         break;
                 }
             }
@@ -510,8 +514,8 @@ angular.module('ng360', [])
 
             for (var index in self.options) {
                 switch (index) {
-                    case 'sourceMarkers':
-                        if (self.sourceMarkers.length == 0)  {
+                    case 'markers':
+                        if (self.sourceMarkers.length === 0)  {
                             $location.search("sources", null);
                             break;
                         }
@@ -520,17 +524,6 @@ angular.module('ng360', [])
                             sources.push(elem._latlng.lat + "," + elem._latlng.lng);
                         });
                         $location.search("sources", sources.join(";"));
-                        break;
-                    case 'targetMarkers':
-                        if (self.targetMarkers.length == 0) {
-                             $location.search("targets", null);
-                            break;
-                        };
-                        var targets = [];
-                        self.targetMarkers.forEach(function(elem,index,array){
-                            targets.push(elem._latlng.lat + "," + elem._latlng.lng);
-                        });
-                        $location.search("targets", targets.join(";"));
                         break;
                     case 'areaID':
                     case 'travelTime':
@@ -557,9 +550,9 @@ angular.module('ng360', [])
          */
         function addMarker(coords, polygons, markerIcon, route) {
 
-            if (!angular.isDefined(icon)) markerIcon = L.AwesomeMarkers.icon({ icon: 'fa-circle', prefix : 'fa', markerColor: 'red' });
-            if (!angular.isDefined(route)) route = 'source';
-            if (!angular.isDefined(route)) polygons = 'true';
+            if (!angular.isDefined(markerIcon)) markerIcon = L.AwesomeMarkers.icon({ icon: 'fa-circle', prefix : 'fa', markerColor: 'red' });
+            if (!angular.isDefined(route)) route           = 'source';
+            if (!angular.isDefined(polygons)) polygons     = 'true';
 
             if (typeof coords[0] != 'undefined' || typeof coords[1] != 'undefined')
                 if (typeof coords.lat != 'undefined' || typeof coords.lng != 'undefined')
@@ -585,7 +578,7 @@ angular.module('ng360', [])
                 contextmenuItems: [
                 {
                     text: 'Delete Marker',
-                    callback: removeMarkerFromContext,
+                    callback: removeMarkerFromContext, // TODO
                     index: 3,
                     iconFa: 'fa-fw fa-times'
                 }, {
@@ -602,6 +595,24 @@ angular.module('ng360', [])
             return newMarker;
         }
 
+        function removeMarker(marker) {
+
+            layerGroups.markerLayerGroup.removeLayer(marker);
+
+            self.markers.forEach(function(elem, index, array) {
+                if (elem == marker) {
+                    array.splice(index, 1);
+                }
+            });
+
+            getPolygons();
+
+        }
+
+        function removeMarkerFromContext(e) {
+            removeMarker(lastRelatedTarget);
+        }
+
         function buildPlaceDescription(rawResult) {
 
             var result = {
@@ -609,33 +620,31 @@ angular.module('ng360', [])
                 meta1 : "",
                 meta2 : "",
                 full  : ""
-            }
+            };
 
-            var name = undefined;
-            var adress1 = undefined;
-            var adress2 = undefined;
+            var name, adress1, adress2;
 
-            if (angular.isDefined(rawResult['name'])) {
+            if (angular.isDefined(rawResult.name)) {
                 name = rawResult.name;
             }
 
-            if (angular.isDefined(rawResult['street'])) {
+            if (angular.isDefined(rawResult.street)) {
                 adress1 = rawResult.street;
-                if (angular.isDefined(rawResult['housenumber'])){
+                if (angular.isDefined(rawResult.housenumber)){
                     adress1 += " " + rawResult.housenumber;
                 }
             }
 
-            if (angular.isDefined(rawResult['city'])){
+            if (angular.isDefined(rawResult.city)){
                 adress2 = rawResult.city;
-                if ((angular.isDefined(rawResult['postcode']))) {
+                if ((angular.isDefined(rawResult.postcode))) {
                     adress2 = rawResult.postcode + " " + adress2;
                 }
-                if ((angular.isDefined(rawResult['country']))) {
+                if ((angular.isDefined(rawResult.country))) {
                     adress2 += ", " + rawResult.country;
                 }
             } else {
-                if ((angular.isDefined(rawResult['country']))) {
+                if ((angular.isDefined(rawResult.country))) {
                     adress2 = rawResult.country;
                 }
             }
@@ -650,9 +659,9 @@ angular.module('ng360', [])
             }
 
             if (name !== adress1) result.full = result.title;
-            if (result.meta1 != '' && angular.isDefined(result.meta1) && name !== adress1)  result.full += ", " +  result.meta1;
-            if (result.meta1 != '' && angular.isDefined(result.meta1) && name == adress1)  result.full +=  result.meta1;
-            if (result.meta2 != '' && angular.isDefined(result.meta2))  result.full += ", " +  result.meta2;
+            if (result.meta1 !== '' && angular.isDefined(result.meta1) && name !== adress1)  result.full += ", " +  result.meta1;
+            if (result.meta1 !== '' && angular.isDefined(result.meta1) && name == adress1)  result.full +=  result.meta1;
+            if (result.meta2 !== '' && angular.isDefined(result.meta2))  result.full += ", " +  result.meta2;
 
             return result;
         }

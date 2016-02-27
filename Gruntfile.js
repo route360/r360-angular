@@ -53,7 +53,8 @@ module.exports = function(grunt) {
 						Pikaday : false,
 						module  : false,
 						forge   : false,
-						r360    : false
+						r360    : false,
+						L       : false
 					}
 				},
 				beforeconcat:   {
