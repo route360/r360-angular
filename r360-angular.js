@@ -152,13 +152,14 @@ angular.module('ng360', [])
             scope.options.newU5                = false;
             scope.options.endpoint             = 'brandenburg';
             scope.options.serviceUrl           = 'https://service.route360.net/brandenburg/';
+            scope.options.showPopLayer         = false;
 
             // constructor
             function R360Angular(map,options) {
 
+                // override the defualt options if anything is desfined in options param
                 this.options = scope.options;
-
-                scope.map    = map;
+                scope.map = map;
 
                 // change to custom options
                 if (angular.isDefined(options)) {
@@ -173,29 +174,31 @@ angular.module('ng360', [])
                 r360.config.serviceKey = scope.options.serviceKey;
                 r360.config.i18n.language = "de";
 
+                // setter for service URL (databinding doesnt work)
                 this.setServiceUrl = function(serviceUrl) {
                     r360.config.serviceUrl = serviceUrl;
                 }
 
-                scope.lastRelatedTarget = null;
+                // helper for context menu
+                this.lastRelatedTarget = null;
+
                 scope.attribution = "<a href='https://cartodb.com/' target='_blank'>© CartoDB</a> | <a href='https://www.openstreetmaps.com/' target='_blank'>© OpenStreetMap</a> | © Transit Data <a href='https://ruter.no' target='_blank'>Ruter</a>, <a href='https://www.kolumbus.no/en/' target='_blank'>Kolumbus</a> | developed by <a href='https://www.route360.net/?lang=en' target='_blank'>Motion Intelligence</a>";
 
                 scope.layerGroups = {
                     tileLayer: L.tileLayer(scope.options.mapstyle, {maxZoom: 18,attribution: scope.attribution}).addTo(map),
-                    // populationDensityLayer: L.tileLayer.wms("https://service.route360.net/geoserver/wms?service=WMS&TILED=true", {
-                    //     layers: 'bevoelkerungsdichte_berlin_brandenburg:brandenburg_pop_density',
-                    //     format: 'image/png',
-                    //     transparent: true,
-                    //     opacity: 0.0
-                    // }).addTo(map),
                     markerLayerGroup: L.featureGroup().addTo(map),
                     routeLayerGroup: L.featureGroup().addTo(map),
-                    reachableLayerGroup: L.featureGroup().addTo(map),
-                    tempLayerGroup: L.featureGroup().addTo(map),
-                    polygonLayerGroup: r360.leafletPolygonLayer({extendWidthX: self.extendWidth, extendWidthY: self.extendWidth}).addTo(map)
+                    polygonLayerGroup: r360.leafletPolygonLayer({extendWidthX: self.extendWidth, extendWidthY: self.extendWidth}).addTo(map),
+                    populationDensityLayer: L.tileLayer.wms("https://service.route360.net/geoserver/wms?service=WMS&TILED=true", {
+                        layers: 'bevoelkerungsdichte_berlin_brandenburg:brandenburg_pop_density',
+                        format: 'image/png',
+                        transparent: true,
+                        opacity: 0.7
+                    })
                 };
+
                 map.on("contextmenu.show", function(e) {
-                    scope.lastRelatedTarget = e.relatedTarget;
+                    this.lastRelatedTarget = e.relatedTarget;
                 });
 
             };
@@ -354,6 +357,23 @@ angular.module('ng360', [])
                     result.lng = parseFloat(coords[1].toFixed(6));
                 }
                 return coords;
+            }
+
+            R360Angular.prototype.togglePopLayer = function(regions) {
+
+                if (!scope.options.showPopLayer) {
+                    scope.options.showPopLayer = true;
+                    if (angular.isDefined(regions)) {
+                        scope.layerGroups.populationDensityLayer.setParams({
+                            layers: regions
+                        })
+                    }
+                    scope.layerGroups.populationDensityLayer.addTo(scope.map)
+                } else {
+                    scope.options.showPopLayer = false;
+                    scope.map.removeLayer(scope.layerGroups.populationDensityLayer);
+                }
+
             }
 
             /**
