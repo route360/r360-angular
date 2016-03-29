@@ -21,7 +21,7 @@
 	],
 	"main" : [
 		"dist/r360-angular.min.js"
-	]
+	],
 	"dependencies" : {
 	    "angular-animate": "~1.4.5",
 	    "leaflet.contextmenu": "https://github.com/j-slvr/Leaflet.contextmenu.git",
