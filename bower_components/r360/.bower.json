@@ -1,0 +1,45 @@
+{
+  "name": "r360",
+  "authors": [
+    "gerber@motionintelligence.net",
+    "hollburg@motionintelligence.net",
+    "jan.silbersiepe@motionintelligence.net"
+  ],
+  "description": "Route360° JavaScript API",
+  "main": "dist/r360-src.js",
+  "keywords": [
+    "r360",
+    "route360",
+    "javascript",
+    "polygon",
+    "routing"
+  ],
+  "dependencies": {
+    "leaflet": "0.7.7",
+    "jquery": "1.11.3"
+  },
+  "homepage": "http://developers.route360.net/",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    ".*",
+    "CHANGELOG.json",
+    "FAQ.md",
+    "debug",
+    "spec",
+    "src",
+    "build"
+  ],
+  "_release": "31eb22e373",
+  "_resolution": {
+    "type": "branch",
+    "branch": "angular-ready",
+    "commit": "31eb22e3730458af6b6f89c9146db42443c8a3c5"
+  },
+  "_source": "https://github.com/route360/r360-js.git",
+  "_target": "angular-ready",
+  "_originalSource": "https://github.com/route360/r360-js.git"
+}

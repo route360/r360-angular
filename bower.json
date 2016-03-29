@@ -1,11 +1,15 @@
 {
-	"name": "settings-demo",
-	"version": "0.0.0",
+	"name": "r360-angular",
 	"authors": [
 		"Jan Silbersiepe <jan.silbersiepe@motionintelligence.net>"
 	],
-	"description": "Demo",
+	"description": "Angular Module for the route360° API by Motion Intelligence",
 	"keywords": [
+		"traveltime",
+		"analysis",
+		"isochrones",
+		"leaflet",
+		"map"
 	],
 	"license": "MIT",
 	"ignore": [
@@ -15,17 +19,19 @@
 		"test",
 		"tests"
 	],
-	"dependencies": {
+	"main" : [
+		"dist/r360-angular.min.js"
+	]
+	"dependencies" : {
 	    "angular-animate": "~1.4.5",
-	    "jquery": "~1.11.3",
 	    "leaflet.contextmenu": "https://github.com/j-slvr/Leaflet.contextmenu.git",
 	    "leaflet-active-area": "https://github.com/j-slvr/Leaflet-active-area.git",
 	    "angular-material": "0.11.3",
 	    "r360": "https://github.com/route360/r360-js.git#angular-ready",
-		"angular":"~1.2.0",
-		"angular-sanitize":"~1.2.0",
-		"angular-route":"~1.2.0",
-		"angular-touch":"~1.2.0"
+			"angular":"~1.2.0",
+			"angular-sanitize":"~1.2.0",
+			"angular-route":"~1.2.0",
+			"angular-touch":"~1.2.0"
 	},
 	"devDependencies": {
 	}
