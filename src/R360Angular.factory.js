@@ -7,7 +7,9 @@
 
 'use strict';
 
-angular.module('ng360', [])
+angular.module('ng360', []);
+
+angular.module('ng360')
     .factory('R360Angular', [ '$q','$location','$timeout','$http', function($q,$location,$timeout,$http) {
 
         var R360Angular = (function() {
@@ -141,15 +143,9 @@ angular.module('ng360', [])
             scope.options.strokeWidth          = 20;
             scope.options.extendWidth          = 500;
             scope.options.mapstyle             = "https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png";
-            scope.options.showmarkers          = true; // TODO needs to be generic
-            scope.options.showTargetMarkers    = false; // TODO needs to be generic
-            scope.options.showSourceIsochrones = false; // TODO needs to be generic
-            scope.options.showTargetIsochrones = false; // TODO needs to be generic
-            scope.options.singleMarkerMode     = true;
             scope.options.maxmarkers           = 5;
             scope.options.maxTargetMarkers     = 5;
             scope.options.customMode           = false;
-            scope.options.newU5                = false;
             scope.options.endpoint             = 'brandenburg';
             scope.options.serviceUrl           = 'https://service.route360.net/brandenburg/';
             scope.options.showPopLayer         = false;
@@ -194,7 +190,7 @@ angular.module('ng360', [])
                         layers: 'bevoelkerungsdichte_berlin_brandenburg:brandenburg_pop_density',
                         format: 'image/png',
                         transparent: true,
-                        opacity: 0.7
+                        opacity: 0.5
                     })
                 };
 
@@ -337,6 +333,14 @@ angular.module('ng360', [])
             };
 
             /**
+             * Returns the current tt range array
+             * @return Array
+             */
+            R360Angular.prototype.getTravelTimeRangeArray = function() {
+                return scope.prefs.travelTimeRanges[scope.options.travelTimeRange];
+            };
+
+            /**
              * Noormalizes latlng to an object with each 6 decimal steps
              * @param  Object/Array coords coords as array or object
              * @return Object        Coords in the format {lat: xx.xxxxxx, lng: xx.xxxxxx}
@@ -376,6 +380,66 @@ angular.module('ng360', [])
                 }
 
             };
+
+            R360Angular.prototype.getPopData = function(populationServiceUrl, success){
+
+                var url = populationServiceUrl + "?key=6RNT8QMSOBQN0KMFXIPD&travelType=" +scope.options.travelType+ "&maxRoutingTime=" + scope.options.travelTime * 60 + "&statistics=population_total";
+
+                var payload = [];
+
+                scope.options.markers.forEach(function(marker) {
+                    if (marker.polygons && marker.route == 'source') payload.push({ lat : marker._latlng.lat, lng : marker._latlng.lng, id : marker._latlng.lat + ";" + marker._latlng.lng});
+                });
+
+                if (payload.length < 1) return;
+
+                $http({
+                 method      : "post",
+                 url         : url,
+                 data        : payload,
+                 contentType : 'application/json',
+                 cache       : true
+                })
+                .success(function(result, status, headers, config){
+
+                var rawData;
+                var resultData = {
+                    nvd3Data : [
+                        {
+                            key: "Population",
+                            values: []
+                        }
+                    ],
+                    max : 0,
+                };
+
+                rawData = result[0].values;
+                var sum = 0;
+                rawData.forEach(function(dataset,index){
+
+                    if ( index > scope.options.travelTime ) return;
+
+                    sum += dataset;
+                    resultData.nvd3Data[0].values.push({
+                     label: (index == 0) ? "<1" : index,
+                     value: sum
+                    });
+
+                    resultData.max = sum;
+                });
+
+                if (angular.isDefined(success)) success(resultData);
+
+                })
+                .error(function(data, status, headers, config){
+
+                 console.log(data);
+                 console.log(status);
+                 console.log(headers);
+                 console.log(config);
+                });
+            };
+
 
             /**
              * Function for geocoding
@@ -462,7 +526,6 @@ angular.module('ng360', [])
 
                 if (scope.options.markers.length === 0) {
                     scope.layerGroups.polygonLayerGroup.clearLayers();
-                    // vm.chart.data[0].values=[];  // ???
                     if (angular.isDefined(success)) success('normarkers');
                 }
 

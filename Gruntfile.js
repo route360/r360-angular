@@ -19,6 +19,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   /**
   Function that wraps everything to allow dynamically setting/changing grunt options and config later by grunt task. This init function is called once immediately (for using the default grunt options, config, and setup) and then may be called again AFTER updating grunt (command line) options.
@@ -72,10 +73,10 @@ module.exports = function(grunt) {
         }
       },
       concat: {
-        options: {
-          // define a string to put between each file in the concatenated output
-          separator: ';'
-        },
+        // options: {
+        //   // define a string to put between each file in the concatenated output
+        //   separator: ';'
+        // },
         dist: {
           // the files to concatenate
           src: ['src/**/*.js'],
@@ -92,7 +93,16 @@ module.exports = function(grunt) {
           src:    'dist/r360-angular.js',
           dest:   'dist/r360-angular.min.js'
         }
-      }/*,
+      },
+      watch: {
+        scripts: {
+          files: ['src/**/*.js'],
+          tasks: ['jshint:beforeconcatQ','concat', 'uglify:build'],
+          options: {
+            spawn: false,
+          },
+        },
+      },/*,
       karma: {
         unit: {
           configFile: publicPathRelativeRoot+'config/karma.conf.js',

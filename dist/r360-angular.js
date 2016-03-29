@@ -7,7 +7,9 @@
 
 'use strict';
 
-angular.module('ng360', [])
+angular.module('ng360', []);
+
+angular.module('ng360')
     .factory('R360Angular', [ '$q','$location','$timeout','$http', function($q,$location,$timeout,$http) {
 
         var R360Angular = (function() {
@@ -141,15 +143,9 @@ angular.module('ng360', [])
             scope.options.strokeWidth          = 20;
             scope.options.extendWidth          = 500;
             scope.options.mapstyle             = "https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png";
-            scope.options.showmarkers          = true; // TODO needs to be generic
-            scope.options.showTargetMarkers    = false; // TODO needs to be generic
-            scope.options.showSourceIsochrones = false; // TODO needs to be generic
-            scope.options.showTargetIsochrones = false; // TODO needs to be generic
-            scope.options.singleMarkerMode     = true;
             scope.options.maxmarkers           = 5;
             scope.options.maxTargetMarkers     = 5;
             scope.options.customMode           = false;
-            scope.options.newU5                = false;
             scope.options.endpoint             = 'brandenburg';
             scope.options.serviceUrl           = 'https://service.route360.net/brandenburg/';
             scope.options.showPopLayer         = false;
@@ -194,7 +190,7 @@ angular.module('ng360', [])
                         layers: 'bevoelkerungsdichte_berlin_brandenburg:brandenburg_pop_density',
                         format: 'image/png',
                         transparent: true,
-                        opacity: 0.7
+                        opacity: 0.5
                     })
                 };
 
@@ -337,6 +333,14 @@ angular.module('ng360', [])
             };
 
             /**
+             * Returns the current tt range array
+             * @return Array
+             */
+            R360Angular.prototype.getTravelTimeRangeArray = function() {
+                return scope.prefs.travelTimeRanges[scope.options.travelTimeRange];
+            };
+
+            /**
              * Noormalizes latlng to an object with each 6 decimal steps
              * @param  Object/Array coords coords as array or object
              * @return Object        Coords in the format {lat: xx.xxxxxx, lng: xx.xxxxxx}
@@ -376,6 +380,66 @@ angular.module('ng360', [])
                 }
 
             };
+
+            R360Angular.prototype.getPopData = function(populationServiceUrl, success){
+
+                var url = populationServiceUrl + "?key=6RNT8QMSOBQN0KMFXIPD&travelType=" +scope.options.travelType+ "&maxRoutingTime=" + scope.options.travelTime * 60 + "&statistics=population_total";
+
+                var payload = [];
+
+                scope.options.markers.forEach(function(marker) {
+                    if (marker.polygons && marker.route == 'source') payload.push({ lat : marker._latlng.lat, lng : marker._latlng.lng, id : marker._latlng.lat + ";" + marker._latlng.lng});
+                });
+
+                if (payload.length < 1) return;
+
+                $http({
+                 method      : "post",
+                 url         : url,
+                 data        : payload,
+                 contentType : 'application/json',
+                 cache       : true
+                })
+                .success(function(result, status, headers, config){
+
+                var rawData;
+                var resultData = {
+                    nvd3Data : [
+                        {
+                            key: "Population",
+                            values: []
+                        }
+                    ],
+                    max : 0,
+                };
+
+                rawData = result[0].values;
+                var sum = 0;
+                rawData.forEach(function(dataset,index){
+
+                    if ( index > scope.options.travelTime ) return;
+
+                    sum += dataset;
+                    resultData.nvd3Data[0].values.push({
+                     label: (index == 0) ? "<1" : index,
+                     value: sum
+                    });
+
+                    resultData.max = sum;
+                });
+
+                if (angular.isDefined(success)) success(resultData);
+
+                })
+                .error(function(data, status, headers, config){
+
+                 console.log(data);
+                 console.log(status);
+                 console.log(headers);
+                 console.log(config);
+                });
+            };
+
 
             /**
              * Function for geocoding
@@ -462,7 +526,6 @@ angular.module('ng360', [])
 
                 if (scope.options.markers.length === 0) {
                     scope.layerGroups.polygonLayerGroup.clearLayers();
-                    // vm.chart.data[0].values=[];  // ???
                     if (angular.isDefined(success)) success('normarkers');
                 }
 
@@ -713,3 +776,134 @@ angular.module('ng360', [])
 
         return R360Angular;
     }]);
+
+
+/**
+ * @ngdoc directive
+ * @name r360DemoApp.directive:r360Rainbow
+ * @description
+ * # r360Rainbow
+ */
+angular.module('ng360')
+  .directive('r360Rainbow', function () {
+    return {
+      restrict: 'E',
+      templateUrl: 'rainbow.tpl',
+      // controller: 'RainbowCtrl',
+      // controllerAs: 'rainbowCtrl',
+      scope: {
+        travelTime: '=',
+        travelTimeRange: '=',
+        colorRange: '='
+      }
+    };
+  })
+
+angular.module('ng360')
+  .run(function ($templateCache){
+
+      var tpl = "<md-whiteframe class='md-whiteframe-z2' flex layout layout-align='center center'>\
+          <label ng-repeat='tt in travelTimeRange.times' ng-if='travelTime >= tt && colorRange.colors.length > 1' flex style='background: {{colorRange.colors[$index]}}'>\
+            {{tt}} Min\
+          </label>\
+          <label ng-if='colorRange.colors.length == 1' flex style='background: {{colorRange.colors[0]}}'>\
+            {{travelTime}} Min\
+          </label>\
+        </md-whiteframe>"
+
+      $templateCache.put('rainbow.tpl', tpl);
+  });
+
+
+
+angular.module('ng360')
+  .controller('TsChartCtrl', ['$scope','$timeout','$attrs', function($scope,$timeout,$attrs){
+
+
+    var vm = this;
+    vm.chartApi = {};
+
+    console.log($attrs);
+    console.log( $scope);
+
+    $timeout(function(){
+      console.log($attrs);
+      console.log($scope);
+    },1000)
+
+    $scope.$watch('chartData', function(value) {
+      console.log('chartdata has changed value to');
+      console.log(value);
+      if (angular.isDefined($scope.chartData)) {
+        vm.data = [{
+          key: "Population",
+          values: $scope.chartData
+        }]
+      }
+    });
+
+    vm.data = [{
+        key: "Population",
+        values: []
+    }]
+
+    // vm.data[0] = $scope.chartData.nvd3Data[0];
+
+    vm.options = {
+      chart: {
+          type: 'discreteBarChart',
+          height: 300,
+          margin : {
+              top: 30,
+              right: 30,
+              bottom: 50,
+              left: 70
+          },
+          x: function(d){return d.label;},
+          y: function(d){return d.value;},
+          showValues: false,
+          valueFormat: d3.format('.0f'),
+          duration: 500,
+          xAxis: {
+              axisLabel: 'Time in min',
+              tickFormat: function(d,i){
+                  if (2 % mod == 0) return d;
+              }
+          },
+          color: function(d,i){
+              if ($scope.colorRange.id == 'inverse') return $scope.colorRange.colors[0];
+              // if (i<=10) return $scope.colorRange.colors[0];
+              // if (i<=20 && i>10) return $scope.colorRange.colors[1];
+              // if (i<=30 && i>20) return $scope.colorRange.colors[2];
+              // if (i<=40 && i>30) return $scope.colorRange.colors[3];
+              // if (i<=50 && i>40) return $scope.colorRange.colors[4];
+              // if (i<=60 && i>50) return $scope.colorRange.colors[5];
+              if (i<=5) return $scope.colorRange.colors[0];
+              if (i<=10 && i>5) return $scope.colorRange.colors[1];
+              if (i<=15 && i>10) return $scope.colorRange.colors[2];
+              if (i<=20 && i>15) return $scope.colorRange.colors[3];
+              if (i<=25 && i>20) return $scope.colorRange.colors[4];
+              if (i<=30 && i>25) return $scope.colorRange.colors[5];
+          },
+          yAxis: {
+              axisLabel: 'Reachable people',
+              tickFormat: d3.format("s")
+          }
+      }
+    };
+
+  }])
+
+angular.module('ng360')
+  .directive('timeServiceChart', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        chartData: '=',
+        colorRange: '='
+      },
+      template: '<nvd3 flex options="tsChartCtrl.options" data="tsChartCtrl.data" api="tsChartCtrl.chartApi"></nvd3>',
+      controllerAs: 'tsChartCtrl',
+      controller: 'TsChartCtrl'
+    }
+  });
