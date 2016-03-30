@@ -126,49 +126,50 @@ angular.module('ng360')
                 ]
             };
 
-            // default options
-
-            scope.options = {};
-
-            scope.options.serviceKey           = "6RNT8QMSOBQN0KMFXIPD";
-            scope.options.areaID               = "germany";
-            scope.options.travelTime           = 30;
-            scope.options.travelTimeRange      = '5to30';
-            scope.options.travelType           = 'transit';
-            scope.options.queryTime            = { h : hour, m : minute };
-            scope.options.queryDate            = now;
-            scope.options.colorRange           = 'default';
-            scope.options.markers              = [];
-            scope.options.intersection         = 'union';
-            scope.options.strokeWidth          = 20;
-            scope.options.extendWidth          = 500;
-            scope.options.mapstyle             = "https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png";
-            scope.options.maxmarkers           = 5;
-            scope.options.maxTargetMarkers     = 5;
-            scope.options.customMode           = false;
-            scope.options.endpoint             = 'brandenburg';
-            scope.options.serviceUrl           = 'https://service.route360.net/brandenburg/';
-            scope.options.populationServiceUrl = 'https://service.route360.net/brandenburg_population/population/';
-            scope.options.showPopLayer         = false;
 
             // constructor
             function R360Angular(map,options) {
 
-                this.options = scope.options;
                 scope.map = map;
                 var self = this;
+
+                // default options
+
+                self.options = {};
+
+                self.options.serviceKey           = "6RNT8QMSOBQN0KMFXIPD";
+                self.options.areaID               = "germany";
+                self.options.travelTime           = 30;
+                self.options.travelTimeRange      = '5to30';
+                self.options.travelType           = 'transit';
+                self.options.queryTime            = { h : hour, m : minute };
+                self.options.queryDate            = now;
+                self.options.colorRange           = 'default';
+                self.options.markers              = [];
+                self.options.intersection         = 'union';
+                self.options.strokeWidth          = 20;
+                self.options.extendWidth          = 500;
+                self.options.mapstyle             = "https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png";
+                self.options.maxmarkers           = 5;
+                self.options.maxTargetMarkers     = 5;
+                self.options.customMode           = false;
+                self.options.endpoint             = 'brandenburg';
+                self.options.serviceUrl           = 'https://service.route360.net/brandenburg/';
+                self.options.populationServiceUrl = 'https://service.route360.net/brandenburg_population/population/';
+                self.options.showPopLayer         = false;
+
 
                 // change to custom options
                 if (angular.isDefined(options)) {
                     for (var i in options) {
-                        scope.options[i] = options[i];
+                        self.options[i] = options[i];
                     }
                 }
 
                 r360.config.defaultPolygonLayerOptions.backgroundOpacity = 0.3;
                 r360.config.requestTimeout = 10000;
-                r360.config.serviceUrl = scope.options.serviceUrl;
-                r360.config.serviceKey = scope.options.serviceKey;
+                r360.config.serviceUrl = self.options.serviceUrl;
+                r360.config.serviceKey = self.options.serviceKey;
                 r360.config.i18n.language = "de";
 
                 // setter for service URL (databinding doesnt work)
@@ -177,15 +178,15 @@ angular.module('ng360')
                 };
 
                 // helper for context menu
-                scope.lastRelatedTarget = this.lastRelatedTarget = null;
+                this.lastRelatedTarget = null;
 
-                scope.attribution = "<a href='https://cartodb.com/' target='_blank'>© CartoDB</a> | <a href='https://www.openstreetmaps.com/' target='_blank'>© OpenStreetMap</a> | © Transit Data <a href='https://ruter.no' target='_blank'>Ruter</a>, <a href='https://www.kolumbus.no/en/' target='_blank'>Kolumbus</a> | developed by <a href='https://www.route360.net/?lang=en' target='_blank'>Motion Intelligence</a>";
+                this.attribution = "<a href='https://cartodb.com/' target='_blank'>© CartoDB</a> | <a href='https://www.openstreetmaps.com/' target='_blank'>© OpenStreetMap</a> | © Transit Data <a href='https://ruter.no' target='_blank'>Ruter</a>, <a href='https://www.kolumbus.no/en/' target='_blank'>Kolumbus</a> | developed by <a href='https://www.route360.net/?lang=en' target='_blank'>Motion Intelligence</a>";
 
-                scope.layerGroups = {
-                    tileLayer: L.tileLayer(scope.options.mapstyle, {maxZoom: 18,attribution: scope.attribution}).addTo(map),
+                this.layerGroups = {
+                    tileLayer: L.tileLayer(self.options.mapstyle, {maxZoom: 18,attribution: this.attribution}).addTo(map),
                     markerLayerGroup: L.featureGroup().addTo(map),
                     routeLayerGroup: L.featureGroup().addTo(map),
-                    polygonLayerGroup: r360.leafletPolygonLayer({extendWidthX: scope.options.extendWidth, extendWidthY: scope.options.extendWidth}).addTo(map),
+                    polygonLayerGroup: r360.leafletPolygonLayer({extendWidthX: self.options.extendWidth, extendWidthY: self.options.extendWidth}).addTo(map),
                     populationDensityLayer: L.tileLayer.wms("https://service.route360.net/geoserver/wms?service=WMS&TILED=true", {
                         layers: 'bevoelkerungsdichte_berlin_brandenburg:brandenburg_pop_density',
                         format: 'image/png',
@@ -199,7 +200,7 @@ angular.module('ng360')
                 });
 
                 function removeMarkerFromContext(e) {
-                    self.removeMarker(scope.lastRelatedTarget);
+                    self.removeMarker(self.lastRelatedTarget);
                 }
 
             }
@@ -212,25 +213,27 @@ angular.module('ng360')
              * Builds r360 traveloptions. For intenal use only
              * @return r360.travelOptions
              */
-            function getTravelOptions() {
+            R360Angular.prototype.getTravelOptions = function() {
+
+                var self = this;
 
                 var travelOptions = r360.travelOptions();
 
-                var travelTime = scope.options.travelTime * 60;
+                var travelTime = self.options.travelTime * 60;
                 var travelTimes=[];
                 var defaultColors =[];
 
-                scope.prefs.travelTimeRanges[scope.options.travelTimeRange].times.forEach(function(elem, index, array) {
+                scope.prefs.travelTimeRanges[self.options.travelTimeRange].times.forEach(function(elem, index, array) {
                     var dataSet = {};
                     dataSet.time  = elem*60;
-                    dataSet.color = scope.prefs.colorRanges[scope.options.colorRange].colors[index];
-                    dataSet.opacity = scope.prefs.colorRanges[scope.options.colorRange].opacities[index];
+                    dataSet.color = scope.prefs.colorRanges[self.options.colorRange].colors[index];
+                    dataSet.opacity = scope.prefs.colorRanges[self.options.colorRange].opacities[index];
                     defaultColors.push(dataSet);
                 });
 
                 r360.config.defaultTravelTimeControlOptions.travelTimes = defaultColors;
 
-                if (scope.options.colorRange == 'inverse') {
+                if (self.options.colorRange == 'inverse') {
                     travelTimes.push(travelTime);
                 } else {
                     defaultColors.forEach(function(elem, index, array) {
@@ -240,44 +243,46 @@ angular.module('ng360')
                     });
                 }
 
-                if (scope.options.colorRange == 'inverse') {
-                    scope.layerGroups.polygonLayerGroup.setInverse(true);
+                if (self.options.colorRange == 'inverse') {
+                    self.layerGroups.polygonLayerGroup.setInverse(true);
                 } else {
-                    scope.layerGroups.polygonLayerGroup.setInverse(false);
+                    self.layerGroups.polygonLayerGroup.setInverse(false);
                 };
 
                 travelOptions.setTravelTimes(travelTimes);
-                travelOptions.setTravelType(scope.options.travelType);
+                travelOptions.setTravelType(self.options.travelType);
 
                 // Query for source markers
 
-                scope.options.markers.forEach(function(marker) {
+                self.options.markers.forEach(function(marker) {
                     if (marker.polygons && marker.route == 'source') travelOptions.addSource(marker);
                     if (marker.route == 'target') travelOptions.addTarget(marker);
                     // elem.id=Math.random()*100000; // Prevent cache hack
                 });
 
-                travelOptions.extendWidthX = scope.options.extendWidth * 2;
-                travelOptions.extendWidthY = scope.options.extendWidth * 2;
+                travelOptions.extendWidthX = self.options.extendWidth * 2;
+                travelOptions.extendWidthY = self.options.extendWidth * 2;
 
-                travelOptions.setIntersectionMode(scope.options.intersection);
+                travelOptions.setIntersectionMode(self.options.intersection);
 
-                if (scope.options.travelType == 'transit') {
+                if (self.options.travelType == 'transit') {
 
-                    var date = String(scope.options.queryDate.getFullYear()) + ('0' + String(scope.options.queryDate.getMonth()+1)).slice(-2) + ('0' + String(scope.options.queryDate.getDate())).slice(-2);
+                    var date = String(self.options.queryDate.getFullYear()) + ('0' + String(self.options.queryDate.getMonth()+1)).slice(-2) + ('0' + String(self.options.queryDate.getDate())).slice(-2);
                     travelOptions.setDate(date);
-                    var rawTime = scope.options.queryTime;
+                    var rawTime = self.options.queryTime;
                     var time = rawTime.h * 3600 + rawTime.m * 60;
 
                     travelOptions.setTime(time);
                 }
 
-                travelOptions.setMinPolygonHoleSize(scope.options.travelTime * 3600 * 2000);
+                travelOptions.setMinPolygonHoleSize(self.options.travelTime * 3600 * 2000);
 
                 return travelOptions;
             }
 
-            function buildPlaceDescription(rawResult) {
+            R360Angular.prototype.buildPlaceDescription = function(rawResult) {
+
+                var self = this;
 
                 var result = {
                     title : "",
@@ -335,7 +340,8 @@ angular.module('ng360')
              * @return Array
              */
             R360Angular.prototype.getColorRangeArray = function() {
-                return scope.prefs.colorRanges[scope.options.colorRange];
+                var self = this;
+                return scope.prefs.colorRanges[self.options.colorRange];
             };
 
             /**
@@ -343,7 +349,8 @@ angular.module('ng360')
              * @return Array
              */
             R360Angular.prototype.getTravelTimeRangeArray = function() {
-                return scope.prefs.travelTimeRanges[scope.options.travelTimeRange];
+                var self = this;
+                return scope.prefs.travelTimeRanges[self.options.travelTimeRange];
             };
 
             /**
@@ -352,6 +359,8 @@ angular.module('ng360')
              * @return Object        Coords in the format {lat: xx.xxxxxx, lng: xx.xxxxxx}
              */
             R360Angular.prototype.normalizeLatLng = function(coords) {
+
+                var self = this;
 
                 var result = {
                     lat : undefined,
@@ -372,32 +381,36 @@ angular.module('ng360')
 
             R360Angular.prototype.togglePopLayer = function(regions) {
 
-                if (!scope.options.showPopLayer) {
-                    scope.options.showPopLayer = true;
+                var self = this;
+
+                if (!self.options.showPopLayer) {
+                    self.options.showPopLayer = true;
                     if (angular.isDefined(regions)) {
-                        scope.layerGroups.populationDensityLayer.setParams({
+                        self.layerGroups.populationDensityLayer.setParams({
                             layers: regions
                         });
                     }
-                    scope.layerGroups.populationDensityLayer.addTo(scope.map);
-                    scope.options.colorRange = 'inverse';
+                    self.layerGroups.populationDensityLayer.addTo(scope.map);
+                    self.options.colorRange = 'inverse';
                 } else {
-                    scope.options.showPopLayer = false;
-                    scope.map.removeLayer(scope.layerGroups.populationDensityLayer);
-                    scope.options.colorRange = 'default';
+                    self.options.showPopLayer = false;
+                    scope.map.removeLayer(self.layerGroups.populationDensityLayer);
+                    self.options.colorRange = 'default';
                 }
 
             };
 
             R360Angular.prototype.getPopData = function(success, customPopulationServiceUrl){
 
-                var populationServiceUrl = angular.isDefined(customPopulationServiceUrl) ? customPopulationServiceUrl : scope.options.populationServiceUrl;
+                var self = this;
 
-                var url = populationServiceUrl + "?key=" + scope.options.serviceKey +"&travelType=" +scope.options.travelType+ "&maxRoutingTime=" + scope.options.travelTime * 60 + "&statistics=population_total";
+                var populationServiceUrl = angular.isDefined(customPopulationServiceUrl) ? customPopulationServiceUrl : self.options.populationServiceUrl;
+
+                var url = populationServiceUrl + "?key=" + self.options.serviceKey +"&travelType=" +self.options.travelType+ "&maxRoutingTime=" + self.options.travelTime * 60 + "&statistics=population_total";
 
                 var payload = [];
 
-                scope.options.markers.forEach(function(marker) {
+                self.options.markers.forEach(function(marker) {
                     if (marker.polygons && marker.route == 'source') payload.push({ lat : marker._latlng.lat, lng : marker._latlng.lng, id : marker._latlng.lat + ";" + marker._latlng.lng});
                 });
 
@@ -430,7 +443,7 @@ angular.module('ng360')
                     var sum = 0;
                     rawData.forEach(function(dataset,index){
 
-                        if ( index > scope.options.travelTime ) return;
+                        if ( index > self.options.travelTime ) return;
 
                         sum += dataset;
                         resultData.nvd3Data[0].values.push({
@@ -462,6 +475,8 @@ angular.module('ng360')
              */
             R360Angular.prototype.geocode = function(query,coords) {
 
+                var self = this;
+
                 var results = [];
                 var deferred = $q.defer();
 
@@ -488,6 +503,8 @@ angular.module('ng360')
              * @return Promise       Promise returns the best match
              */
             R360Angular.prototype.reverseGeocode = function(coords) {
+
+                var self = this;
 
                 var url = "";
 
@@ -535,25 +552,27 @@ angular.module('ng360')
              */
             R360Angular.prototype.getPolygons = function(success,error) {
 
-                if (!angular.isDefined(scope.layerGroups)) return;
+                var self = this;
 
-                if (scope.options.markers.length === 0) {
-                    scope.layerGroups.polygonLayerGroup.clearLayers();
+                if (!angular.isDefined(self.layerGroups)) return;
+
+                if (self.options.markers.length === 0) {
+                    self.layerGroups.polygonLayerGroup.clearLayers();
                     if (angular.isDefined(success)) success('normarkers');
                 }
 
-                var method = scope.options.markers.length > 5 ? 'POST' : 'GET';
+                var method = self.options.markers.length > 5 ? 'POST' : 'GET';
 
-                if (scope.options.colorRange == 'inverse') {
-                    scope.layerGroups.polygonLayerGroup.setInverse(true);
+                if (self.options.colorRange == 'inverse') {
+                    self.layerGroups.polygonLayerGroup.setInverse(true);
                 } else {
-                    scope.layerGroups.polygonLayerGroup.setInverse(false);
+                    self.layerGroups.polygonLayerGroup.setInverse(false);
                 }
 
-                var travelOptions = getTravelOptions();
+                var travelOptions = self.getTravelOptions();
 
                 if (travelOptions.getSources().length < 1) {
-                    scope.layerGroups.polygonLayerGroup.clearLayers();
+                    self.layerGroups.polygonLayerGroup.clearLayers();
                     if (angular.isDefined(success)) success('normarkers');
                     return;
                 }
@@ -561,7 +580,7 @@ angular.module('ng360')
                 $timeout(function() {
                     r360.PolygonService.getTravelTimePolygons(travelOptions,
                     function(polygons) {
-                        scope.layerGroups.polygonLayerGroup.clearAndAddLayers(polygons, false);
+                        self.layerGroups.polygonLayerGroup.clearAndAddLayers(polygons, false);
                         if (angular.isDefined(success)) success();
                     },
                     function(status,message) {
@@ -579,22 +598,24 @@ angular.module('ng360')
              */
             R360Angular.prototype.getRoutes = function(success,error) {
 
-                if (!angular.isDefined(scope.layerGroups)) return;
+                var self = this;
 
-                scope.layerGroups.routeLayerGroup.clearLayers();
+                if (!angular.isDefined(self.layerGroups)) return;
 
-                if (scope.options.markers.length === 0) {
+                self.layerGroups.routeLayerGroup.clearLayers();
+
+                if (self.options.markers.length === 0) {
                     if (angular.isDefined(success)) success('normarkers');
                     return;
                 }
 
-                var travelOptions = getTravelOptions();
+                var travelOptions = self.getTravelOptions();
 
                 $timeout(function() {
                     r360.RouteService.getRoutes(travelOptions, function(routes) {
 
                         routes.forEach(function(elem, index, array) {
-                            r360.LeafletUtil.fadeIn(scope.layerGroups.routeLayerGroup, elem, 500, "travelDistance", {
+                            r360.LeafletUtil.fadeIn(self.layerGroups.routeLayerGroup, elem, 500, "travelDistance", {
                                 color: "red",
                                 haloColor: "#fff"
                             });
@@ -610,9 +631,11 @@ angular.module('ng360')
             };
 
             /**
-             * Parses the given GET params and writes the values to scope.options
+             * Parses the given GET params and writes the values to self.options
              */
             R360Angular.prototype.parseGetParams = function($routeParams) {
+
+                var self = this;
 
                 for(var index in $routeParams) {
 
@@ -626,12 +649,12 @@ angular.module('ng360')
                         case "mapProvider" :
                         case "maxmarkers" :
                         case "maxTargetMarkers" :
-                            scope.options[index] = parseInt(value);
+                            self.options[index] = parseInt(value);
                             break;
                         case "areaID" :
                         case "travelType" :
                         case "intersection" :
-                            scope.options[index] = value;
+                            self.options[index] = value;
                             break;
                         case "sources":
                         case "targets":
@@ -643,34 +666,34 @@ angular.module('ng360')
                 }
 
                 // legacy ID support
-                if (angular.isDefined(scope.options.cityID) && typeof scope.options.cityID === "number") {
-                    switch (scope.options.cityID) {
+                if (angular.isDefined(self.options.cityID) && typeof self.options.cityID === "number") {
+                    switch (self.options.cityID) {
                         case 0:
-                            scope.options.areaID = "berlin";
+                            self.options.areaID = "berlin";
                             break;
                         case 1:
-                            scope.options.areaID = "norway";
+                            self.options.areaID = "norway";
                             break;
                         case 2:
-                            scope.options.areaID = "france";
+                            self.options.areaID = "france";
                             break;
                         case 3:
-                            scope.options.areaID = "canada";
+                            self.options.areaID = "canada";
                             break;
                         case 4:
-                            scope.options.areaID = "denmark";
+                            self.options.areaID = "denmark";
                             break;
                         case 5:
-                            scope.options.areaID = "britishisles";
+                            self.options.areaID = "britishisles";
                             break;
                         case 6:
-                            scope.options.areaID = "switzerland";
+                            self.options.areaID = "switzerland";
                             break;
                         case 7:
-                            scope.options.areaID = "austria";
+                            self.options.areaID = "austria";
                             break;
                         case 8:
-                            scope.options.areaID = "newyork";
+                            self.options.areaID = "newyork";
                             break;
                     }
                 }
@@ -681,15 +704,17 @@ angular.module('ng360')
              */
             R360Angular.prototype.updateURL = function($routeParams) {
 
-                for (var index in scope.options.options) {
+                var self = this;
+
+                for (var index in self.options.options) {
                     switch (index) {
                         case 'markers':
-                            if (scope.options.markers.length === 0)  {
+                            if (self.options.markers.length === 0)  {
                                 $location.search("sources", null);
                                 break;
                             }
                             var sources = [];
-                            scope.options.markers.forEach(function(elem,index,array){
+                            self.options.markers.forEach(function(elem,index,array){
                                 sources.push(elem._latlng.lat + "," + elem._latlng.lng);
                             });
                             $location.search("sources", sources.join(";"));
@@ -700,8 +725,8 @@ angular.module('ng360')
                         case 'travelType':
                         case 'colorRange':
                         case 'intersection':
-                            if (angular.isDefined($routeParams[index]) && $routeParams[index] == scope.options[index]) break;
-                            $location.search(index, String(scope.options[index]));
+                            if (angular.isDefined($routeParams[index]) && $routeParams[index] == self.options[index]) break;
+                            $location.search(index, String(self.options[index]));
                             break;
                         default:
                             break;
@@ -718,6 +743,8 @@ angular.module('ng360')
              * @return L.marker The created marker
              */
             R360Angular.prototype.addMarker = function(coords, polygons, route, leafletMarkerOptions) {
+
+                var self = this;
 
                 if (!angular.isDefined(route)) route           = 'source';
                 if (!angular.isDefined(polygons)) polygons     = 'true';
@@ -758,7 +785,7 @@ angular.module('ng360')
                     coords[1] = parseFloat(coords[1].toFixed(6));
                 }
 
-                var markerLayerGroup = scope.layerGroups.markerLayerGroup;
+                var markerLayerGroup = self.layerGroups.markerLayerGroup;
                 var geocode;
 
                 var newMarker = L.marker(coords, markerOptions);
@@ -766,16 +793,18 @@ angular.module('ng360')
                 newMarker.polygons = polygons;
                 newMarker.route = route;
 
-                newMarker.addTo(scope.layerGroups.markerLayerGroup);
-                scope.options.markers.push(newMarker);
+                newMarker.addTo(self.layerGroups.markerLayerGroup);
+                self.options.markers.push(newMarker);
                 return newMarker;
             };
 
             R360Angular.prototype.removeMarker = function(marker) {
 
-                scope.layerGroups.markerLayerGroup.removeLayer(marker);
+                var self = this;
 
-                scope.options.markers.forEach(function(elem, index, array) {
+                self.layerGroups.markerLayerGroup.removeLayer(marker);
+
+                self.options.markers.forEach(function(elem, index, array) {
                     if (elem == marker) {
                         array.splice(index, 1);
                     }
