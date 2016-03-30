@@ -148,12 +148,12 @@ angular.module('ng360')
             scope.options.customMode           = false;
             scope.options.endpoint             = 'brandenburg';
             scope.options.serviceUrl           = 'https://service.route360.net/brandenburg/';
+            scope.options.populationServiceUrl = 'https://service.route360.net/brandenburg_population/population/';
             scope.options.showPopLayer         = false;
 
             // constructor
             function R360Angular(map,options) {
 
-                // override the defualt options if anything is desfined in options param
                 this.options = scope.options;
                 scope.map = map;
                 var self = this;
@@ -239,6 +239,12 @@ angular.module('ng360')
                         }
                     });
                 }
+
+                if (scope.options.colorRange == 'inverse') {
+                    scope.layerGroups.polygonLayerGroup.setInverse(true);
+                } else {
+                    scope.layerGroups.polygonLayerGroup.setInverse(false);
+                };
 
                 travelOptions.setTravelTimes(travelTimes);
                 travelOptions.setTravelType(scope.options.travelType);
@@ -374,16 +380,20 @@ angular.module('ng360')
                         });
                     }
                     scope.layerGroups.populationDensityLayer.addTo(scope.map);
+                    scope.options.colorRange = 'inverse';
                 } else {
                     scope.options.showPopLayer = false;
                     scope.map.removeLayer(scope.layerGroups.populationDensityLayer);
+                    scope.options.colorRange = 'default';
                 }
 
             };
 
-            R360Angular.prototype.getPopData = function(populationServiceUrl, success){
+            R360Angular.prototype.getPopData = function(success, customPopulationServiceUrl){
 
-                var url = populationServiceUrl + "?key=6RNT8QMSOBQN0KMFXIPD&travelType=" +scope.options.travelType+ "&maxRoutingTime=" + scope.options.travelTime * 60 + "&statistics=population_total";
+                var populationServiceUrl = angular.isDefined(customPopulationServiceUrl) ? customPopulationServiceUrl : scope.options.populationServiceUrl;
+
+                var url = populationServiceUrl + "?key=" + scope.options.serviceKey +"&travelType=" +scope.options.travelType+ "&maxRoutingTime=" + scope.options.travelTime * 60 + "&statistics=population_total";
 
                 var payload = [];
 
@@ -391,7 +401,10 @@ angular.module('ng360')
                     if (marker.polygons && marker.route == 'source') payload.push({ lat : marker._latlng.lat, lng : marker._latlng.lng, id : marker._latlng.lat + ";" + marker._latlng.lng});
                 });
 
-                if (payload.length < 1) return;
+                if (payload.length < 1) {
+                    success('nomarkers');
+                    return;
+                };
 
                 $http({
                  method      : "post",
@@ -402,35 +415,35 @@ angular.module('ng360')
                 })
                 .success(function(result, status, headers, config){
 
-                var rawData;
-                var resultData = {
-                    nvd3Data : [
-                        {
-                            key: "Population",
-                            values: []
-                        }
-                    ],
-                    max : 0,
-                };
+                    var rawData;
+                    var resultData = {
+                        nvd3Data : [
+                            {
+                                key: "Population",
+                                values: []
+                            }
+                        ],
+                        max : 0,
+                    };
 
-                rawData = result[0].values;
-                var sum = 0;
-                rawData.forEach(function(dataset,index){
+                    rawData = result[0].values;
+                    var sum = 0;
+                    rawData.forEach(function(dataset,index){
 
-                    if ( index > scope.options.travelTime ) return;
+                        if ( index > scope.options.travelTime ) return;
 
-                    sum += dataset;
-                    resultData.nvd3Data[0].values.push({
-                     label: (index == 0) ? "<1" : index,
-                     value: sum
+                        sum += dataset;
+                        resultData.nvd3Data[0].values.push({
+                         label: (index == 0) ? "<1" : index,
+                         value: sum
+                        });
+
+                        resultData.max = sum;
                     });
 
-                    resultData.max = sum;
-                });
+                    if (angular.isDefined(success)) success(resultData);
 
-                if (angular.isDefined(success)) success(resultData);
-
-                })
+                    })
                 .error(function(data, status, headers, config){
 
                  console.log(data);
@@ -835,13 +848,18 @@ angular.module('ng360')
       console.log('chartdata has changed value to');
       console.log(value);
       if (angular.isDefined($scope.chartData)) {
-        vm.data = [{
-          key: "Population",
-          values: $scope.chartData
-        }]
+        if (angular.isDefined($scope.chartData.nvd3Data)) vm.data = $scope.chartData.nvd3Data;
+        if (angular.isDefined($scope.chartData.max)) vm.max = $scope.chartData.max;
+        // vm.data = [{
+        //   key: "Population",
+        //   values: $scope.chartData
+        // }]
       }
     });
-
+    vm.showChart = function(){
+      vm.data[0].values.length > 0 ? true : false;
+    }
+    vm.max;
     vm.data = [{
         key: "Population",
         values: []
@@ -867,7 +885,7 @@ angular.module('ng360')
           xAxis: {
               axisLabel: 'Time in min',
               tickFormat: function(d,i){
-                  if (2 % mod == 0) return d;
+                  if (d % 2 == 0) return d;
               }
           },
           color: function(d,i){
@@ -902,8 +920,23 @@ angular.module('ng360')
         chartData: '=',
         colorRange: '='
       },
-      template: '<nvd3 flex options="tsChartCtrl.options" data="tsChartCtrl.data" api="tsChartCtrl.chartApi"></nvd3>',
+      templateUrl: 'timeServiceChart.tpl',
       controllerAs: 'tsChartCtrl',
       controller: 'TsChartCtrl'
     }
+  });
+
+angular.module('ng360')
+  .run(function ($templateCache){
+
+      var tpl = "<nvd3 ng-if='tsChartCtrl.data[0].values.length > 0' flex options='tsChartCtrl.options' data='tsChartCtrl.data' api='tsChartCtrl.chartApi'></nvd3>\
+          <md-list-item ng-if='tsChartCtrl.data[0].values.length == 0'>\
+              <p>No population chart to show.</p>\
+          </md-list-item>\
+          <md-list-item ng-if='tsChartCtrl.max'>\
+              <p>Total reachable</p>\
+              <p style='text-align: right'>{{tsChartCtrl.max | number:0}}</p>\
+          </md-list-item>"
+
+      $templateCache.put('timeServiceChart.tpl', tpl);
   });

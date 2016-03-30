@@ -7,7 +7,7 @@ angular.module('ng360')
         chartData: '=',
         colorRange: '='
       },
-      template: '<nvd3 flex options="tsChartCtrl.options" data="tsChartCtrl.data" api="tsChartCtrl.chartApi"></nvd3>',
+      templateUrl: 'timeServiceChart.tpl',
       controllerAs: 'tsChartCtrl',
       controller: 'TsChartCtrl'
     }

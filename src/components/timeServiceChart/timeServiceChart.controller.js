@@ -18,13 +18,18 @@ angular.module('ng360')
       console.log('chartdata has changed value to');
       console.log(value);
       if (angular.isDefined($scope.chartData)) {
-        vm.data = [{
-          key: "Population",
-          values: $scope.chartData
-        }]
+        if (angular.isDefined($scope.chartData.nvd3Data)) vm.data = $scope.chartData.nvd3Data;
+        if (angular.isDefined($scope.chartData.max)) vm.max = $scope.chartData.max;
+        // vm.data = [{
+        //   key: "Population",
+        //   values: $scope.chartData
+        // }]
       }
     });
-
+    vm.showChart = function(){
+      vm.data[0].values.length > 0 ? true : false;
+    }
+    vm.max;
     vm.data = [{
         key: "Population",
         values: []
@@ -50,7 +55,7 @@ angular.module('ng360')
           xAxis: {
               axisLabel: 'Time in min',
               tickFormat: function(d,i){
-                  if (2 % mod == 0) return d;
+                  if (d % 2 == 0) return d;
               }
           },
           color: function(d,i){
