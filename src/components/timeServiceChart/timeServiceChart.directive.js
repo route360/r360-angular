@@ -5,7 +5,8 @@ angular.module('ng360')
       restrict: 'E',
       scope: {
         chartData: '=',
-        colorRange: '='
+        colorRange: '=',
+        traveltimeRange: '='
       },
       templateUrl: 'timeServiceChart.tpl',
       controllerAs: 'tsChartCtrl',

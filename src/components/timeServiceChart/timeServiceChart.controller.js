@@ -55,7 +55,7 @@ angular.module('ng360')
           xAxis: {
               axisLabel: 'Time in min',
               tickFormat: function(d,i){
-                  if (d % 2 == 0) return d;
+                  if (d % 5 == 0) return d;
               }
           },
           color: function(d,i){
@@ -66,12 +66,12 @@ angular.module('ng360')
               // if (i<=40 && i>30) return $scope.colorRange.colors[3];
               // if (i<=50 && i>40) return $scope.colorRange.colors[4];
               // if (i<=60 && i>50) return $scope.colorRange.colors[5];
-              if (i<=5) return $scope.colorRange.colors[0];
-              if (i<=10 && i>5) return $scope.colorRange.colors[1];
-              if (i<=15 && i>10) return $scope.colorRange.colors[2];
-              if (i<=20 && i>15) return $scope.colorRange.colors[3];
-              if (i<=25 && i>20) return $scope.colorRange.colors[4];
-              if (i<=30 && i>25) return $scope.colorRange.colors[5];
+              if (i<=$scope.traveltimeRange.times[0]) return $scope.colorRange.colors[0];
+              if (i<=$scope.traveltimeRange.times[1] && i>$scope.traveltimeRange.times[0]) return $scope.colorRange.colors[1];
+              if (i<=$scope.traveltimeRange.times[2] && i>$scope.traveltimeRange.times[1]) return $scope.colorRange.colors[2];
+              if (i<=$scope.traveltimeRange.times[3] && i>$scope.traveltimeRange.times[2]) return $scope.colorRange.colors[3];
+              if (i<=$scope.traveltimeRange.times[4] && i>$scope.traveltimeRange.times[3]) return $scope.colorRange.colors[4];
+              if (i<=$scope.traveltimeRange.times[5] && i>$scope.traveltimeRange.times[4]) return $scope.colorRange.colors[5];
           },
           yAxis: {
               axisLabel: 'Reachable people',
