@@ -280,61 +280,6 @@ angular.module('ng360')
                 return travelOptions;
             }
 
-            R360Angular.prototype.buildPlaceDescription = function(rawResult) {
-
-                var self = this;
-
-                var result = {
-                    title : "",
-                    meta1 : "",
-                    meta2 : "",
-                    full  : ""
-                };
-
-                var name, adress1, adress2;
-
-                if (angular.isDefined(rawResult.name)) {
-                    name = rawResult.name;
-                }
-
-                if (angular.isDefined(rawResult.street)) {
-                    adress1 = rawResult.street;
-                    if (angular.isDefined(rawResult.housenumber)){
-                        adress1 += " " + rawResult.housenumber;
-                    }
-                }
-
-                if (angular.isDefined(rawResult.city)){
-                    adress2 = rawResult.city;
-                    if ((angular.isDefined(rawResult.postcode))) {
-                        adress2 = rawResult.postcode + " " + adress2;
-                    }
-                    if ((angular.isDefined(rawResult.country))) {
-                        adress2 += ", " + rawResult.country;
-                    }
-                } else {
-                    if ((angular.isDefined(rawResult.country))) {
-                        adress2 = rawResult.country;
-                    }
-                }
-
-                if (angular.isDefined(name)) {
-                    result.title = name;
-                    result.meta1 = adress1;
-                    result.meta2 = adress2;
-                } else {
-                    result.title = adress1;
-                    result.meta1 = adress2;
-                }
-
-                if (name !== adress1) result.full = result.title;
-                if (result.meta1 !== '' && angular.isDefined(result.meta1) && name !== adress1)  result.full += ", " +  result.meta1;
-                if (result.meta1 !== '' && angular.isDefined(result.meta1) && name == adress1)  result.full +=  result.meta1;
-                if (result.meta2 !== '' && angular.isDefined(result.meta2))  result.full += ", " +  result.meta2;
-
-                return result;
-            }
-
             /**
              * Returns the current color range array
              * @return Array
@@ -353,31 +298,6 @@ angular.module('ng360')
                 return scope.prefs.travelTimeRanges[self.options.travelTimeRange];
             };
 
-            /**
-             * Noormalizes latlng to an object with each 6 decimal steps
-             * @param  Object/Array coords coords as array or object
-             * @return Object        Coords in the format {lat: xx.xxxxxx, lng: xx.xxxxxx}
-             */
-            R360Angular.prototype.normalizeLatLng = function(coords) {
-
-                var self = this;
-
-                var result = {
-                    lat : undefined,
-                    lng : undefined
-                };
-
-                if (typeof coords.lat != 'undefined' && typeof coords.lng != 'undefined') {
-                    result.lat = parseFloat(coords.lat.toFixed(6));
-                    result.lng = parseFloat(coords.lng.toFixed(6));
-                }
-
-                if (typeof coords[0] != 'undefined' && typeof coords[1] != 'undefined') {
-                    result.lat = parseFloat(coords[0].toFixed(6));
-                    result.lng = parseFloat(coords[1].toFixed(6));
-                }
-                return coords;
-            };
 
             R360Angular.prototype.togglePopLayer = function(regions) {
 
@@ -466,83 +386,6 @@ angular.module('ng360')
                 });
             };
 
-
-            /**
-             * Function for geocoding
-             * @param  String query  The string to be queried
-             * @param  Object coords Latlng coordinates to bias the results
-             * @return Promise       Promise returns top 5 matches
-             */
-            R360Angular.prototype.geocode = function(query,coords) {
-
-                var self = this;
-
-                var results = [];
-                var deferred = $q.defer();
-
-                $http({
-                    method: 'GET',
-                    url: "https://service.route360.net/geocode/api/?q=" + query + "&lat=" + coords.lat + "&lon=" + coords.lng + "&limit=5"
-                }).then(function(response) {
-                    results = response.data.features.map(function(result) {
-                        result.value = result.properties.osm_id;
-                        result.description = buildPlaceDescription(result.properties);
-                        console.log(result.description);
-                        return result;
-                    });
-                    deferred.resolve(results);
-                }, function(response) {
-                    console.log(response);
-                });
-                return deferred.promise;
-            };
-
-            /**
-             * Function for reverse geocoding
-             * @param  Object coords Latlng coordinates
-             * @return Promise       Promise returns the best match
-             */
-            R360Angular.prototype.reverseGeocode = function(coords) {
-
-                var self = this;
-
-                var url = "";
-
-                var deferred = $q.defer();
-
-                if (typeof coords.lat != 'undefined' && typeof coords.lng != 'undefined')
-                    url = "https://service.route360.net/geocode/reverse?lon=" + coords.lng + "&lat=" + coords.lat;
-
-                if (typeof coords[0] != 'undefined' && typeof coords[1] != 'undefined')
-                    url = "https://service.route360.net/geocode/reverse?lon=" + coords[1] + "&lat=" + coords[0];
-
-                $http({
-                    method: 'GET',
-                    url: url
-                }).then(function(response) {
-                    var properties = {};
-                    if (response.data.features.length > 0) {
-                        properties = response.data.features[0].properties;
-                        if (typeof properties.name === 'undefined') {
-                            properties.name = "";
-                            if (typeof properties.street != 'undefined') properties.name += properties.street;
-                            if (typeof properties.housenumber != 'undefined') properties.name += " " + properties.housenumber;
-                        }
-                    }
-                    else {
-                        properties = {
-                            "name" : "Marker",
-                            "city" : "",
-                            "country" : ""
-                        };
-                    }
-                    deferred.resolve(properties);
-                }, function(response) {
-                    console.log(response);
-                });
-
-                return deferred.promise;
-            };
 
 
             /**
