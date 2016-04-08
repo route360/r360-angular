@@ -1,3 +1,10 @@
+"use strict";
+
+ angular.module('ng360.constants', [])
+
+.constant('CONST', {serviceKey:'OOWOFUK3OPHLQTA8H5JD',prefs:{travelTypes:[{name:'Bike',icon:'md:bike',value:'bike'},{name:'Walk',icon:'md:walk',value:'walk'},{name:'Car',icon:'md:car',value:'car'},{name:'Transit',icon:'md:train',value:'transit'}],queryTimeRange:{hour:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],minute:[0,5,10,15,20,25,30,35,40,45,50,55]},intersectionTypes:{union:{name:'Union',value:'union'},intersection:{name:'Intersection',value:'intersection'},average:{name:'Average',value:'average'}},travelTimeRanges:{'5to30':{name:'5 Min - 30 Min',id:'5to30',times:[5,10,15,20,25,30]},'10to60':{name:'10 Min - 60 Min',id:'10to60',times:[10,20,30,40,50,60]},'20to120':{name:'20 Min - 120 Min',id:'20to120',times:[20,40,60,80,100,120]}},colorRanges:{default:{name:'Green to Red',id:'default',colors:['#006837','#39B54A','#8CC63F','#F7931E','#F15A24','#C1272D'],opacities:[1,1,1,1,1,1]},colorblind:{name:'Colorblind',id:'colorblind',colors:['#142b66','#4525AB','#9527BC','#CE29A8','#DF2A5C','#F0572C'],opacities:[1,1,1,1,1,1]},greyscale:{name:'Greyscale',id:'greyscale',colors:['#d2d2d2','#b2b2b2','#999999','#777777','#555555','#333333'],opacities:[1,0.8,0.6,0.4,0.2,0]},inverse:{name:'Inverse Mode (B/W)',id:'inverse',colors:['#777777'],opacities:[1,1,1,1,1,1]}},mapStyles:{light:{name:'Light',value:'https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'},dark:{name:'Dark',value:'https://cartodb-basemaps-c.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'},osm:{name:'OSM Standard',value:'http://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'}}}})
+
+;
 /**
  * Route 360 for Angular
  * https://github.com/route360/r360-angular
@@ -7,10 +14,10 @@
 
 'use strict';
 
-angular.module('ng360', []);
+angular.module('ng360', ['ng360.constants']);
 
 angular.module('ng360')
-    .factory('R360Angular', [ '$q','$location','$timeout','$http', function($q,$location,$timeout,$http) {
+    .factory('R360Angular', [ '$q','$location','$timeout','$http', 'CONST', function($q,$location,$timeout,$http,CONST) {
 
         var R360Angular = (function() {
 
@@ -23,122 +30,23 @@ angular.module('ng360')
             if (hour === 24) {
                 hour = 0;
             }
-
             // scope var to expose options from constructor to private functions
             // all PRIVATE vars and funcs are only accessible via scope
             // all PUBLIC vars and funcs are accessible via this AND scope
             var scope = {};
-            scope.prefs = {
-                travelTypes: [{
-                    name: "Bike",
-                    icon: "md:bike",
-                    value: "bike",
-                }, {
-                    name: "Walk",
-                    icon: "md:walk",
-                    value: "walk",
-                }, {
-                    name: "Car",
-                    icon: "md:car",
-                    value: "car",
-                }, {
-                    name: "Transit",
-                    icon: "md:train",
-                    value: "transit",
-                }],
-                queryTimeRange: {
-                    hour: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-                    minute: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
-                },
-                mapProviderList: [{
-                    name: "OpenStreetMaps",
-                    value: "osm"
-                }, {
-                    name: "Google Maps",
-                    value: "google"
-                }],
-                intersectionTypes: [
-                    {
-                        name: "Union",
-                        value: "union"
-                    }, {
-                        name: "Intersection",
-                        value: "intersection"
-                    }, {
-                        name: "Average",
-                        value: "average"
-                    },
-                ],
-                travelTimeRanges: {
-                    '5to30' : {
-                        name: "5 Min - 30 Min",
-                        id: '5to30',
-                        times: [5, 10, 15, 20, 25, 30]
-                    },
-                    '10to60': {
-                        name: "10 Min - 60 Min",
-                        id: '10to60',
-                        times: [10, 20, 30, 40, 50, 60]
-                    },
-                    '20to120' : {
-                        name: "20 Min - 120 Min",
-                        id: '20to120',
-                        times: [20, 40, 60, 80, 100, 120]
-                    }
-                },
-                colorRanges: {
-                    default : {
-                        name: "Green to Red",
-                        id: 'default',
-                        colors: ["#006837", "#39B54A", "#8CC63F", "#F7931E", "#F15A24", "#C1272D"],
-                        opacities: [1, 1, 1, 1, 1, 1]
-                    },
-                    colorblind : {
-                        name: "Colorblind",
-                        id: 'colorblind',
-                        colors: ["#142b66", "#4525AB", "#9527BC", "#CE29A8", "#DF2A5C", "#F0572C"],
-                        opacities: [1, 1, 1, 1, 1, 1]
-                    },
-                    greyscale : {
-                        name: "Greyscale",
-                        id: 'greyscale',
-                        colors: ["#d2d2d2", "#b2b2b2", "#999999", "#777777", "#555555", "#333333"],
-                        opacities: [1, 0.8, 0.6, 0.4, 0.2, 0]
-                    },
-                    inverse : {
-                        name: "Inverse Mode (B/W)",
-                        id: 'inverse',
-                        colors: ["#777777"],
-                        opacities: [1, 1, 1, 1, 1, 1]
-                    }
-                },
-                mapStyles: [
-                    {
-                        name: "Light",
-                        value: "https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
-                    }, {
-                        name: "Dark",
-                        value: "https://cartodb-basemaps-c.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
-                    }, {
-                        name: "OSM Standard",
-                        value: "http://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png",
-                    }
-                ]
-            };
-
+            scope.prefs = CONST.prefs;
 
             // constructor
             function R360Angular(map,options) {
 
                 scope.map = map;
                 var self = this;
-
                 // default options
 
                 self.options = {};
 
-                self.options.serviceKey           = "6RNT8QMSOBQN0KMFXIPD";
-                self.options.areaID               = "germany";
+                self.options.serviceKey           = '6RNT8QMSOBQN0KMFXIPD';
+                self.options.areaID               = 'germany';
                 self.options.travelTime           = 30;
                 self.options.travelTimeRange      = '5to30';
                 self.options.travelType           = 'transit';
@@ -149,7 +57,7 @@ angular.module('ng360')
                 self.options.intersection         = 'union';
                 self.options.strokeWidth          = 20;
                 self.options.extendWidth          = 500;
-                self.options.mapstyle             = "https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png";
+                self.options.mapstyle             = 'https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png';
                 self.options.maxmarkers           = 5;
                 self.options.maxTargetMarkers     = 5;
                 self.options.customMode           = false;
@@ -170,7 +78,7 @@ angular.module('ng360')
                 r360.config.requestTimeout = 10000;
                 r360.config.serviceUrl = self.options.serviceUrl;
                 r360.config.serviceKey = self.options.serviceKey;
-                r360.config.i18n.language = "de";
+                r360.config.i18n.language = 'de';
 
                 // setter for service URL (databinding doesnt work)
                 this.setServiceUrl = function(serviceUrl) {
@@ -187,7 +95,7 @@ angular.module('ng360')
                     markerLayerGroup: L.featureGroup().addTo(map),
                     routeLayerGroup: L.featureGroup().addTo(map),
                     polygonLayerGroup: r360.leafletPolygonLayer({extendWidthX: self.options.extendWidth, extendWidthY: self.options.extendWidth}).addTo(map),
-                    populationDensityLayer: L.tileLayer.wms("https://service.route360.net/geoserver/wms?service=WMS&TILED=true", {
+                    populationDensityLayer: L.tileLayer.wms('https://service.route360.net/geoserver/wms?service=WMS&TILED=true', {
                         layers: 'bevoelkerungsdichte_berlin_brandenburg:brandenburg_pop_density',
                         format: 'image/png',
                         transparent: true,
@@ -195,7 +103,7 @@ angular.module('ng360')
                     })
                 };
 
-                map.on("contextmenu.show", function(e) {
+                map.on('contextmenu.show', function(e) {
                     this.lastRelatedTarget = e.relatedTarget;
                 });
 
@@ -205,9 +113,16 @@ angular.module('ng360')
 
             }
 
-            ///////////////////////
-            // Private Functions //
-            ///////////////////////
+            /**
+             * Sets a new tile URL and redraws the map
+             * @param  String url New tile url
+             */
+            R360Angular.prototype.setTileUrl = function(url) {
+              var self = this;
+              self.options.mapstyle = url;
+              self.layerGroups.tileLayer.setUrl(url);
+              self.layerGroups.tileLayer.redraw();
+            };
 
             /**
              * Builds r360 traveloptions. For intenal use only
@@ -223,7 +138,7 @@ angular.module('ng360')
                 var travelTimes=[];
                 var defaultColors =[];
 
-                scope.prefs.travelTimeRanges[self.options.travelTimeRange].times.forEach(function(elem, index, array) {
+                scope.prefs.travelTimeRanges[self.options.travelTimeRange].times.forEach(function(elem, index) {
                     var dataSet = {};
                     dataSet.time  = elem*60;
                     dataSet.color = scope.prefs.colorRanges[self.options.colorRange].colors[index];
@@ -233,17 +148,17 @@ angular.module('ng360')
 
                 r360.config.defaultTravelTimeControlOptions.travelTimes = defaultColors;
 
-                if (self.options.colorRange == 'inverse') {
+                if (self.options.colorRange === 'inverse') {
                     travelTimes.push(travelTime);
                 } else {
-                    defaultColors.forEach(function(elem, index, array) {
+                    defaultColors.forEach(function(elem) {
                         if (elem.time <= travelTime) {
                             travelTimes.push(elem.time);
                         }
                     });
                 }
 
-                if (self.options.colorRange == 'inverse') {
+                if (self.options.colorRange === 'inverse') {
                     self.layerGroups.polygonLayerGroup.setInverse(true);
                 } else {
                     self.layerGroups.polygonLayerGroup.setInverse(false);
@@ -736,6 +651,48 @@ angular.module('ng360')
   });
 
 
+
+angular.module('ng360')
+  .controller('MsSwitcherCtrl', ['$scope','CONST', function($scope,CONST){
+
+    var vm = this;
+    vm.map = {};
+    vm.mapStyles = CONST.prefs.mapStyles;
+
+    $scope.$watch('r360Angular', function(value) {
+      if (angular.isDefined($scope.r360Angular) && $scope.r360Angular) {
+        vm.mapstyle = value.options.mapstyle;
+      }
+    });
+
+    vm.change = function() {
+      if (angular.isDefined($scope.r360Angular) && $scope.r360Angular) $scope.r360Angular.setTileUrl(vm.mapstyle);
+    };
+
+  }]);
+
+
+angular.module('ng360')
+  .directive('mapStyleSwitcher', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        r360Angular: '='
+      },
+      templateUrl: 'mapStyleSwitcher.tpl',
+      controllerAs: 'msSwitcherCtrl',
+      controller: 'MsSwitcherCtrl'
+    };
+  });
+
+angular.module('ng360')
+  .run(function ($templateCache){
+
+      var tpl = '<md-select style="margin: 0" ng-model="msSwitcherCtrl.mapstyle" aria-label="Map Style Select" ng-change="msSwitcherCtrl.change()"><md-option ng-repeat="style in msSwitcherCtrl.mapStyles" value="{{style.value}}">{{style.name}}</md-option></md-select>';
+
+      $templateCache.put('mapStyleSwitcher.tpl', tpl);
+  });
+
 /**
  * @ngdoc directive
  * @name r360DemoApp.directive:r360Rainbow
@@ -775,51 +732,34 @@ angular.module('ng360')
 
 
 angular.module('ng360')
-  .controller('TsChartCtrl', ['$scope','$timeout','$attrs', function($scope,$timeout,$attrs){
-
+  .controller('TsChartCtrl', ['$scope','$timeout','$attrs', function($scope){
 
     var vm = this;
     vm.chartApi = {};
-
-    console.log($attrs);
-    console.log( $scope);
-
-    $timeout(function(){
-      console.log($attrs);
-      console.log($scope);
-    },1000)
-
+    
     $scope.$watch('chartData', function(value) {
-      console.log('chartdata has changed value to');
       console.log(value);
-      if (angular.isDefined($scope.chartData)) {
+      if (angular.isDefined($scope.chartData) && $scope.chartData) {
         if (angular.isDefined($scope.chartData.nvd3Data)) vm.data = $scope.chartData.nvd3Data;
-        if (angular.isDefined($scope.chartData.max)) vm.max = $scope.chartData.max;
-        // vm.data = [{
-        //   key: "Population",
-        //   values: $scope.chartData
-        // }]
       }
     });
     vm.showChart = function(){
-      vm.data[0].values.length > 0 ? true : false;
-    }
-    vm.max;
-    vm.data = [{
-        key: "Population",
-        values: []
-    }]
+      return vm.data[0].values.length > 0 ? true : false;
+    };
 
-    // vm.data[0] = $scope.chartData.nvd3Data[0];
+    vm.data = [{
+        key: 'Population',
+        values: []
+    }];
 
     vm.options = {
       chart: {
           type: 'discreteBarChart',
           height: 300,
           margin : {
-              top: 30,
-              right: 30,
-              bottom: 50,
+              top: 10,
+              right: 10,
+              bottom: 40,
               left: 70
           },
           x: function(d){return d.label;},
@@ -829,18 +769,12 @@ angular.module('ng360')
           duration: 500,
           xAxis: {
               axisLabel: 'Time in min',
-              tickFormat: function(d,i){
-                  if (d % 5 == 0) return d;
+              tickFormat: function(d){
+                  if (d % 5 === 0) return d;
               }
           },
           color: function(d,i){
-              if ($scope.colorRange.id == 'inverse') return $scope.colorRange.colors[0];
-              // if (i<=10) return $scope.colorRange.colors[0];
-              // if (i<=20 && i>10) return $scope.colorRange.colors[1];
-              // if (i<=30 && i>20) return $scope.colorRange.colors[2];
-              // if (i<=40 && i>30) return $scope.colorRange.colors[3];
-              // if (i<=50 && i>40) return $scope.colorRange.colors[4];
-              // if (i<=60 && i>50) return $scope.colorRange.colors[5];
+              if ($scope.colorRange.id === 'inverse') return $scope.colorRange.colors[0];
               if (i<=$scope.traveltimeRange.times[0]) return $scope.colorRange.colors[0];
               if (i<=$scope.traveltimeRange.times[1] && i>$scope.traveltimeRange.times[0]) return $scope.colorRange.colors[1];
               if (i<=$scope.traveltimeRange.times[2] && i>$scope.traveltimeRange.times[1]) return $scope.colorRange.colors[2];
@@ -850,18 +784,20 @@ angular.module('ng360')
           },
           yAxis: {
               axisLabel: 'Reachable people',
-              tickFormat: d3.format("s")
+              tickFormat: d3.format('s')
           }
       }
     };
 
-  }])
+  }]);
+
 
 angular.module('ng360')
   .directive('timeServiceChart', function() {
     return {
       restrict: 'E',
       scope: {
+        r360Angular: '=',
         chartData: '=',
         colorRange: '=',
         traveltimeRange: '='
@@ -869,20 +805,13 @@ angular.module('ng360')
       templateUrl: 'timeServiceChart.tpl',
       controllerAs: 'tsChartCtrl',
       controller: 'TsChartCtrl'
-    }
+    };
   });
 
 angular.module('ng360')
   .run(function ($templateCache){
 
-      var tpl = "<nvd3 ng-if='tsChartCtrl.data[0].values.length > 0' flex options='tsChartCtrl.options' data='tsChartCtrl.data' api='tsChartCtrl.chartApi'></nvd3>\
-          <md-list-item ng-if='tsChartCtrl.data[0].values.length == 0'>\
-              <p>No population chart to show.</p>\
-          </md-list-item>\
-          <md-list-item ng-if='tsChartCtrl.max'>\
-              <p>Total reachable</p>\
-              <p style='text-align: right'>{{tsChartCtrl.max | number:0}}</p>\
-          </md-list-item>"
+      var tpl = '<nvd3 ng-if="tsChartCtrl.data[0].values.length > 0" flex options="tsChartCtrl.options" data="tsChartCtrl.data" api="tsChartCtrl.chartApi"></nvd3><p ng-if="tsChartCtrl.data[0].values.length == 0">No population chart to show.</p>';
 
       $templateCache.put('timeServiceChart.tpl', tpl);
   });

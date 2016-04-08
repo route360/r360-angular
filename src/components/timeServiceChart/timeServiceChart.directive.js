@@ -4,6 +4,7 @@ angular.module('ng360')
     return {
       restrict: 'E',
       scope: {
+        r360Angular: '=',
         chartData: '=',
         colorRange: '=',
         traveltimeRange: '='
@@ -11,5 +12,5 @@ angular.module('ng360')
       templateUrl: 'timeServiceChart.tpl',
       controllerAs: 'tsChartCtrl',
       controller: 'TsChartCtrl'
-    }
+    };
   });
