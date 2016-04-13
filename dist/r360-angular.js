@@ -590,10 +590,13 @@ angular.module('ng360')
       if (angular.isDefined($scope.placeChanged) && angular.isDefined(item) ) $scope.placeChanged({item: item});
     }
 
-    vm.geocode = R360Util.geocode;
+    vm.placeholder        = angular.isDefined($scope.placeholder) ? $scope.placeholder : 'Search...';
+    
+    vm.geocode            = R360Util.geocode;
     vm.selectedItemChange = selectedItemChange;
 
   }])
+
 /**
  * @ngdoc directive
  * @name r360DemoApp.directive:r360Rainbow
@@ -610,10 +613,11 @@ angular.module('ng360')
       scope: {
         bias: '=',
         selectedPlace: '=',
+        placeholder: '@',
         placeChanged: '&'
       }
     };
-  })
+  });
 
 angular.module('ng360')
   .run(function ($templateCache){
@@ -626,7 +630,7 @@ angular.module('ng360')
               md-items='item in geocoderCtrl.geocode(geocoderCtrl.searchText)'\
               md-item-text='item.description.full'\
               md-min-length='3'\
-              placeholder='Add marker...'\
+              placeholder='{{geocoderCtrl.placeholder}}'\
               md-menu-class='r360-autocomplete'>\
             <md-item-template>\
             <span class='item-title'>\
@@ -649,7 +653,6 @@ angular.module('ng360')
 
       $templateCache.put('geocoder.tpl', tpl);
   });
-
 
 
 angular.module('ng360')
