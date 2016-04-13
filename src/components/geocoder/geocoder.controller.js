@@ -4,9 +4,6 @@ angular.module('ng360')
 
     var vm = this;
 
-    $scope.selectedPlace = vm.selectedPlace;
-    vm.searchText = null;
-
     function selectedItemChange(item) {
       if (angular.isDefined($scope.placeChanged) && angular.isDefined(item) ) $scope.placeChanged({item: item});
     }

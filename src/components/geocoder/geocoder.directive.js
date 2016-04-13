@@ -16,7 +16,7 @@ angular.module('ng360')
         selectedPlace: '=',
         placeholder: '@',
         placeChanged: '&',
-        currentPlace: '='
+        searchText: '='
       }
     };
   });

@@ -583,9 +583,6 @@ angular.module('ng360')
 
     var vm = this;
 
-    $scope.selectedPlace = vm.selectedPlace;
-    vm.searchText = null;
-
     function selectedItemChange(item) {
       if (angular.isDefined($scope.placeChanged) && angular.isDefined(item) ) $scope.placeChanged({item: item});
     }
@@ -615,7 +612,7 @@ angular.module('ng360')
         selectedPlace: '=',
         placeholder: '@',
         placeChanged: '&',
-        currentPlace: '='
+        searchText: '='
       }
     };
   });
@@ -624,13 +621,13 @@ angular.module('ng360')
   .run(function ($templateCache){
 
       var tpl = "<md-autocomplete flex\
-              md-selected-item='geocoderCtrl.selectedPlace'\
-              md-search-text='geocoderCtrl.searchText'\
+              md-selected-item='selectedPlace'\
+              md-search-text='searchText'\
               md-selected-item-change='geocoderCtrl.selectedItemChange(item)'\
-              md-items='item in geocoderCtrl.geocode(geocoderCtrl.searchText)'\
+              md-items='item in geocoderCtrl.geocode(searchText)'\
               md-item-text='item.description.full'\
               md-min-length='3'\
-              placeholder='{{geocoderCtrl.placeholder}}'\
+              placeholder='{{placeholder}}'\
               md-menu-class='r360-autocomplete'>\
             <md-item-template>\
             <span class='item-title'>\
