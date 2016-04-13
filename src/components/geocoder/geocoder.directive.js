@@ -14,8 +14,8 @@ angular.module('ng360')
       scope: {
         bias: '=',
         selectedPlace: '=',
-        placeholder: "@",
+        placeholder: '@',
         placeChanged: '&'
       }
     };
-  })
+  });
