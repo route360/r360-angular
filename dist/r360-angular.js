@@ -951,7 +951,7 @@ angular.module('ng360')
          * @param  Object coords Latlng coordinates
          * @return Promise       Promise returns the best match
          */
-        function reverseGeocode(coords) {
+        function reverseGeocode(coords,geojson) {
 
             var url = "";
 
@@ -983,7 +983,9 @@ angular.module('ng360')
                         "country" : ""
                     };
                 }
-                deferred.resolve(properties);
+                if (angular.isDefined(geojson) && geojson) deferred.resolve(response.data.features[0]);
+                else deferred.resolve(properties);
+
             }, function(response) {
                 console.log(response);
             });
