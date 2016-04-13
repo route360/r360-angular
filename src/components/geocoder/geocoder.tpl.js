@@ -1,9 +1,8 @@
 angular.module('ng360')
   .run(function ($templateCache){
 
-      var tpl = "<form flex ng-submit='$event.preventDefault()'>\
-          <md-autocomplete flex\
-              md-selected-item='geocoderCtrl.selectedItem'\
+      var tpl = "<md-autocomplete flex\
+              md-selected-item='geocoderCtrl.selectedPlace'\
               md-search-text='geocoderCtrl.searchText'\
               md-selected-item-change='geocoderCtrl.selectedItemChange(item)'\
               md-items='item in geocoderCtrl.geocode(geocoderCtrl.searchText)'\
@@ -27,8 +26,7 @@ angular.module('ng360')
             <md-not-found>\
               No matches found for '{{geocoderCtrl.searchText}}'.\
             </md-not-found>\
-          </md-autocomplete>\
-        </form>"
+          </md-autocomplete>"
 
       $templateCache.put('geocoder.tpl', tpl);
   });

@@ -583,7 +583,7 @@ angular.module('ng360')
 
     var vm = this;
 
-    vm.selectedItem = null;
+    $scope.selectedPlace = vm.selectedPlace;
     vm.searchText = null;
 
     function selectedItemChange(item) {
@@ -591,7 +591,7 @@ angular.module('ng360')
     }
 
     vm.placeholder        = angular.isDefined($scope.placeholder) ? $scope.placeholder : 'Search...';
-    
+
     vm.geocode            = R360Util.geocode;
     vm.selectedItemChange = selectedItemChange;
 
@@ -614,7 +614,8 @@ angular.module('ng360')
         bias: '=',
         selectedPlace: '=',
         placeholder: '@',
-        placeChanged: '&'
+        placeChanged: '&',
+        currentPlace: '='
       }
     };
   });
@@ -622,9 +623,8 @@ angular.module('ng360')
 angular.module('ng360')
   .run(function ($templateCache){
 
-      var tpl = "<form flex ng-submit='$event.preventDefault()'>\
-          <md-autocomplete flex\
-              md-selected-item='geocoderCtrl.selectedItem'\
+      var tpl = "<md-autocomplete flex\
+              md-selected-item='geocoderCtrl.selectedPlace'\
               md-search-text='geocoderCtrl.searchText'\
               md-selected-item-change='geocoderCtrl.selectedItemChange(item)'\
               md-items='item in geocoderCtrl.geocode(geocoderCtrl.searchText)'\
@@ -648,8 +648,7 @@ angular.module('ng360')
             <md-not-found>\
               No matches found for '{{geocoderCtrl.searchText}}'.\
             </md-not-found>\
-          </md-autocomplete>\
-        </form>"
+          </md-autocomplete>"
 
       $templateCache.put('geocoder.tpl', tpl);
   });

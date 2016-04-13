@@ -4,7 +4,7 @@ angular.module('ng360')
 
     var vm = this;
 
-    vm.selectedItem = null;
+    $scope.selectedPlace = vm.selectedPlace;
     vm.searchText = null;
 
     function selectedItemChange(item) {
@@ -12,7 +12,7 @@ angular.module('ng360')
     }
 
     vm.placeholder        = angular.isDefined($scope.placeholder) ? $scope.placeholder : 'Search...';
-    
+
     vm.geocode            = R360Util.geocode;
     vm.selectedItemChange = selectedItemChange;
 

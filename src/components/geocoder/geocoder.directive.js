@@ -15,7 +15,8 @@ angular.module('ng360')
         bias: '=',
         selectedPlace: '=',
         placeholder: '@',
-        placeChanged: '&'
+        placeChanged: '&',
+        currentPlace: '='
       }
     };
   });
