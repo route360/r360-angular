@@ -9,7 +9,7 @@ angular.module('ng360')
               md-items='item in geocoderCtrl.geocode(geocoderCtrl.searchText)'\
               md-item-text='item.description.full'\
               md-min-length='3'\
-              placeholder='geocoderCtrl.placeholder'\
+              placeholder='{{geocoderCtrl.placeholder}}'\
               md-menu-class='r360-autocomplete'>\
             <md-item-template>\
             <span class='item-title'>\
