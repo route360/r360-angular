@@ -11,7 +11,7 @@ angular.module('ng360')
       if (angular.isDefined($scope.placeChanged) && angular.isDefined(item) ) $scope.placeChanged({item: item});
     }
 
-    vm.geocode = R360Util.geocode;
+    vm.geocode            = R360Util.geocode;
     vm.selectedItemChange = selectedItemChange;
 
   }])
