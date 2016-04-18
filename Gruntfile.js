@@ -21,6 +21,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-ng-constant');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
 
   /**
@@ -145,7 +146,6 @@ module.exports = function(grunt) {
         production: {
         }
       },
-
       jshint: {
         options: {
           //force:          true,
@@ -209,10 +209,19 @@ module.exports = function(grunt) {
           dest:   'dist/r360-angular.min.js'
         }
       },
+      copy: {
+        main: {
+          files: [
+            // Inject script into other projects...
+            {expand: true, cwd: 'dist/', src: '**/*.js', dest: '../place-analyzer/src/main/webapp/assets/scripts/', filter: 'isFile'},
+            //{expand: true, src: ['dist/*.js'], dest: '../naturtrip.org/src/main/webapp/assets/scripts/', filter: 'isFile'},
+          ],
+        },
+      },
       watch: {
         scripts: {
           files: ['src/**/*.js'],
-          tasks: ['ngconstant:production','jshint:beforeconcatQ','concat', 'uglify:build'],
+          tasks: ['ngconstant:production','jshint:beforeconcatQ','concat', 'uglify:build', 'copy'],
           options: {
             spawn: false,
           },
