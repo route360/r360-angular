@@ -27,7 +27,7 @@
 	    "leaflet.contextmenu": "https://github.com/j-slvr/Leaflet.contextmenu.git",
 	    "leaflet-active-area": "https://github.com/j-slvr/Leaflet-active-area.git",
 	    "angular-material": "0.11.3",
-	    "r360": "https://github.com/route360/r360-js.git#angular-ready",
+	    "route360": "route360#angular-ready",
 			"angular":"~1.2.0",
 			"angular-sanitize":"~1.2.0",
 			"angular-route":"~1.2.0",
