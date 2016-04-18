@@ -194,7 +194,7 @@ module.exports = function(grunt) {
         // },
         dist: {
           // the files to concatenate
-          src: ['src/constants.js','src/**/*.js'],
+          src: ['src/constants.js', 'src/R360Angular.factory.js','src/**/*.js'],
           // the location of the resulting JS file
           dest: 'dist/r360-angular.js'
         }
