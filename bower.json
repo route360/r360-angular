@@ -33,7 +33,5 @@
 			"angular-touch":"~1.2.0"
 	},
 	"devDependencies": {
-			// "angular-nvd3" : "~1.0.5",
-	    // "leaflet.contextmenu": "https://github.com/j-slvr/Leaflet.contextmenu.git",
 	}
 }
