@@ -1,4 +1,4 @@
-"use strict";
+"use strict"; 
 
  angular.module('ng360.constants', [])
 
@@ -579,6 +579,113 @@ angular.module('ng360')
 
 
 angular.module('ng360')
+  .controller('EsriGeocoderCtrl', ['$scope','$timeout','$attrs', '$q', '$http', 'R360Util', function($scope,$timeout,$attrs,$q,$http,R360Util){
+
+    var vm = this;
+
+    function selectedItemChange(item) {
+
+      if(!angular.isDefined(item)) return;
+
+      var url = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + item.magicKey + "&text=" + item.text;
+
+      $http({
+          method: 'GET',
+          url: url
+      }).then(function(response) {
+
+          if (angular.isDefined($scope.placeChanged) && angular.isDefined(response) ) $scope.placeChanged({item: response.data.locations[0]});
+
+      }, function(response) {
+          console.log(response);
+      });
+    }
+
+    function suggest(text) {
+
+      var results = [];
+      var deferred = $q.defer();
+
+      var url = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?f=json&text=" + text;
+      if (angular.isDefined($scope.latlng)) {
+        var latlng = R360Util.normalizeLatLng($scope.latlng);
+        url += "&location=" + latlng.lat + "," + latlng.lng;
+      }
+      if (angular.isDefined($scope.distance)) url += "&distance=" + $scope.distance;
+
+      $http({
+          method: 'GET',
+          url: url
+      }).then(function(response) {
+
+          if (!angular.isDefined(response.data.suggestions)) deferred.reject('no result');;
+
+          deferred.resolve(response.data.suggestions);
+
+      }, function(response) {
+          console.log(response);
+      });
+      return deferred.promise;
+    }
+
+    vm.placeholder        = angular.isDefined($scope.placeholder) ? $scope.placeholder : 'Search...';
+    vm.suggest            = suggest;
+    vm.selectedItemChange = selectedItemChange;
+
+
+  }])
+
+/**
+ * @ngdoc directive
+ * @name r360DemoApp.directive:r360Rainbow
+ * @description
+ * # r360Rainbow
+ */
+angular.module('ng360')
+  .directive('r360EsriGeocoder', function () {
+    return {
+      restrict: 'E',
+      templateUrl: 'esriGeocoder.tpl',
+      controller: 'EsriGeocoderCtrl',
+      controllerAs: 'esriGeocoderCtrl',
+      scope: {
+        selectedPlace: '=',
+        placeholder: '@',
+        latlng: '=',
+        distance: '=',
+        placeChanged: '&',
+        searchText: '='
+      }
+    };
+  });
+
+angular.module('ng360')
+  .run(function ($templateCache){
+
+      var tpl = "<md-autocomplete flex\
+              md-selected-item='selectedPlace'\
+              md-search-text='searchText'\
+              md-selected-item-change='esriGeocoderCtrl.selectedItemChange(item)'\
+              md-items='item in esriGeocoderCtrl.suggest(searchText)'\
+              md-item-text='item.text'\
+              md-min-length='3'\
+              placeholder='{{placeholder}}'\
+              md-menu-class='r360-autocomplete'>\
+            <md-item-template>\
+            <span class='item-title'>\
+                <span>{{item.text}}</span>\
+              </span>\
+            </md-item-template>\
+            <md-not-found>\
+              No matches found for '{{searchText}}'.\
+            </md-not-found>\
+          </md-autocomplete>"
+
+      $templateCache.put('esriGeocoder.tpl', tpl);
+  });
+
+
+angular.module('ng360')
   .controller('GeocoderCtrl', ['$scope','$timeout','$attrs', 'R360Util', function($scope,$timeout,$attrs,R360Util){
 
     var vm = this;
@@ -899,16 +1006,16 @@ angular.module('ng360')
                 lng : undefined
             };
 
-            if (typeof coords.lat != 'undefined' && typeof coords.lng != 'undefined') {
+            if (typeof coords.lat !== 'undefined' && typeof coords.lng !== 'undefined') {
                 result.lat = parseFloat(coords.lat.toFixed(6));
                 result.lng = parseFloat(coords.lng.toFixed(6));
             }
 
-            if (typeof coords[0] != 'undefined' && typeof coords[1] != 'undefined') {
+            if (typeof coords[0] !== 'undefined' && typeof coords[1] !== 'undefined') {
                 result.lat = parseFloat(coords[0].toFixed(6));
                 result.lng = parseFloat(coords[1].toFixed(6));
             }
-            return coords;
+            return result;
         };
 
         /**

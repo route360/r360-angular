@@ -82,16 +82,16 @@ angular.module('ng360')
                 lng : undefined
             };
 
-            if (typeof coords.lat != 'undefined' && typeof coords.lng != 'undefined') {
+            if (typeof coords.lat !== 'undefined' && typeof coords.lng !== 'undefined') {
                 result.lat = parseFloat(coords.lat.toFixed(6));
                 result.lng = parseFloat(coords.lng.toFixed(6));
             }
 
-            if (typeof coords[0] != 'undefined' && typeof coords[1] != 'undefined') {
+            if (typeof coords[0] !== 'undefined' && typeof coords[1] !== 'undefined') {
                 result.lat = parseFloat(coords[0].toFixed(6));
                 result.lng = parseFloat(coords[1].toFixed(6));
             }
-            return coords;
+            return result;
         };
 
         /**

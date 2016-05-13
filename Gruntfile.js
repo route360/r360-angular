@@ -39,7 +39,7 @@ module.exports = function(grunt) {
         options: {
           name: 'ng360.constants',
           dest: './src/constants.js',
-          wrap: '"use strict";\n\n {%= __ngModule %}',
+          wrap: '"use strict"; \n\n {%= __ngModule %}',
           constants: {
             CONST: {
               serviceKey : 'OOWOFUK3OPHLQTA8H5JD',
@@ -149,7 +149,7 @@ module.exports = function(grunt) {
       jshint: {
         options: {
           //force:          true,
-          globalstrict:   true,
+          strict:   false,
           //sub:            true,
           multistr:true,
           node: true,
@@ -213,7 +213,7 @@ module.exports = function(grunt) {
         main: {
           files: [
             // Inject script into other projects...
-            {expand: true, cwd: 'dist/', src: '**/*.js', dest: '../place-analyzer/src/main/webapp/assets/scripts/', filter: 'isFile'},
+            {expand: true, cwd: 'dist/', src: '**/*.js', dest: '../motionintelligence-avisum/src/main/webapp/bower_components/r360-angular/dist/', filter: 'isFile'},
             //{expand: true, src: ['dist/*.js'], dest: '../naturtrip.org/src/main/webapp/assets/scripts/', filter: 'isFile'},
           ],
         },
@@ -224,6 +224,7 @@ module.exports = function(grunt) {
           tasks: ['ngconstant:production','jshint:beforeconcatQ','concat', 'uglify:build', 'copy'],
           options: {
             spawn: false,
+            livereload: true
           },
         },
       },/*,
