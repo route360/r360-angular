@@ -8,7 +8,7 @@ angular.module('ng360')
 
       if(!angular.isDefined(item)) return;
 
-      var url = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + item.magicKey + "&text=" + item.text;
+      var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + item.magicKey + "&text=" + item.text;
 
       $http({
           method: 'GET',
