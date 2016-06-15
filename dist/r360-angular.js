@@ -589,7 +589,7 @@ angular.module('ng360')
 
       var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + item.magicKey + "&text=" + item.text;
 
-      if (angular.isDefined($scope.token)) url += "&forStorage=true&token=" + token;
+      if (angular.isDefined($scope.token)) url += "&forStorage=true&token=" + $scope.token;
 
       $http({
           method: 'GET',
