@@ -17,7 +17,8 @@ angular.module('ng360')
         latlng: '=',
         distance: '=',
         placeChanged: '&',
-        searchText: '='
+        searchText: '=',
+        token: '='
       }
     };
   });
