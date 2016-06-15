@@ -734,7 +734,7 @@ angular.module('ng360')
               md-selected-item='selectedPlace'\
               md-search-text='searchText'\
               md-selected-item-change='geocoderCtrl.selectedItemChange(item)'\
-              md-items='item in geocoderCtrl.geocode(searchText)'\
+              md-items='item in geocoderCtrl.geocode(searchText,bias)'\
               md-item-text='item.description.full'\
               md-min-length='3'\
               placeholder='{{placeholder}}'\
