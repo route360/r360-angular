@@ -20,7 +20,7 @@
 		"tests"
 	],
 	"main" : [
-		"dist/r360-angular.min.js"
+		"dist/r360-angular.js"
 	],
 	"dependencies" : {
 	    "angular-animate": "^1.4.5",

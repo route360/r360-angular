@@ -587,7 +587,9 @@ angular.module('ng360')
 
       if(!angular.isDefined(item)) return;
 
-      var url = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + item.magicKey + "&text=" + item.text;
+      var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + item.magicKey + "&text=" + item.text;
+
+      if (angular.isDefined($scope.token)) url += "&forStorage=true&token=" + token;
 
       $http({
           method: 'GET',
@@ -654,7 +656,8 @@ angular.module('ng360')
         latlng: '=',
         distance: '=',
         placeChanged: '&',
-        searchText: '='
+        searchText: '=',
+        token: '='
       }
     };
   });
