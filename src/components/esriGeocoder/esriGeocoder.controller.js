@@ -29,7 +29,7 @@ angular.module('ng360')
       var results = [];
       var deferred = $q.defer();
 
-      var url = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?f=json&text=" + text;
+      var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?f=json&text=" + text;
       if (angular.isDefined($scope.latlng)) {
         var latlng = R360Util.normalizeLatLng($scope.latlng);
         url += "&location=" + latlng.lat + "," + latlng.lng;
