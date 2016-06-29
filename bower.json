@@ -25,9 +25,9 @@
 	"dependencies" : {
 	    "angular-animate": "^1.4.5",
 	    "leaflet-active-area": "https://github.com/j-slvr/Leaflet-active-area.git",
-	    "angular-material": "^0.11.3",
+	    "angular-material": "^1.1.0-RC5",
 	    "route360": "route360#angular-ready",
-			"angular":"^1.2.0",
+			"angular":"^1.5.0",
 			"angular-sanitize":"^1.2.0",
 			"angular-route":"^1.2.0",
 			"angular-touch":"^1.2.0"
