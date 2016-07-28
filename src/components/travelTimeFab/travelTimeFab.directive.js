@@ -7,6 +7,7 @@ angular.module('ng360')
         model: '=',
         colorRange: '=',
         travelTimeRange: '=',
+        travelTimeValues: '=',
         mdDirection: '@',
         label: '@'
       },

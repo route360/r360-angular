@@ -5,6 +5,7 @@ angular.module('ng360')
       restrict: 'E',
       scope: {
         model: '=',
+        travelTypes: '=',
         mdDirection: '@',
         label: '@'
       },
