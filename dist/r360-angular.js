@@ -925,6 +925,118 @@ angular.module('ng360')
       $templateCache.put('timeServiceChart.tpl', tpl);
   });
 
+angular.module('ng360')
+  .controller('TravelTimeFabCtrl', ['$scope', function($scope) {
+    this.select = function(value) {
+      $scope.model = value * 60
+    }
+   }]);
+
+angular.module('ng360')
+  .directive('travelTimeFab', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        model: '=',
+        colorRange: '=',
+        travelTimeRange: '=',
+        mdDirection: '@',
+        label: '@'
+      },
+      templateUrl: 'travelTimeFab.tpl',
+      controllerAs: 'travelTimeFabCtrl',
+      controller: 'TravelTimeFabCtrl'
+    };
+  });
+
+angular.module('ng360')
+  .run(function ($templateCache) {
+      var tpl = 
+        '<md-fab-speed-dial class="md-fling" md-direction="{{mdDirection || \'left\'}}">' +
+          '<md-fab-trigger>' +
+            '<md-button aria-label="{{label}}" class="md-fab">' +
+              '{{model && model / 60 || 0}} Min.' +
+              '<md-tooltip md-delay="500">{{label}}</md-tooltip>' +
+            '</md-button>' +
+          '</md-fab-trigger>' + 
+          '<md-fab-actions>' +
+            '<div ng-repeat="time in travelTimeRange.times | orderBy:$index:true ">' + 
+              '<md-button ng-click="travelTimeFabCtrl.select(time)" aria-label="{{label}} {{time}}" class="md-fab md-mini" ng-style="{background: colorRange.colors[5 - $index]}">' +
+                '{{time}}' +
+              '</md-button>' +
+            '</div>' +
+          '</md-fab-actions>' + 
+        '</md-fab-speed-dial>';
+
+      $templateCache.put('travelTimeFab.tpl', tpl);
+  });
+
+
+angular.module('ng360')
+  .controller('TravelTypeFabCtrl', ['$scope', function($scope) {
+    var vm = this;
+
+    this.travelTypes = [
+      {name: 'Walk',   mode: 'walk',    icon: 'directions_walk'},
+      {name: 'Bike',   mode: 'bike',    icon: 'directions_bike'},
+      {name: 'Car',    mode: 'car',     icon: 'time_to_leave'},
+      {name: 'Trasit', mode: 'transit', icon: 'train'}
+    ];
+
+    this.select = function(value) {
+      $scope.model = value
+    };
+
+    $scope.$watch('model', function() {
+      for (var i = 0; i < vm.travelTypes.length; i++) {
+        if (vm.travelTypes[i].mode == $scope.model) {
+          $scope.current = vm.travelTypes[i]
+        }
+      }
+    })
+  }]);
+
+
+angular.module('ng360')
+  .directive('travelTypeFab', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        model: '=',
+        mdDirection: '@',
+        label: '@'
+      },
+      templateUrl: 'travelTypeFab.tpl',
+      controllerAs: 'travelTypeFabCtrl',
+      controller: 'TravelTypeFabCtrl'
+    };
+  });
+
+angular.module('ng360')
+  .run(function ($templateCache) {
+
+      var tpl = 
+      '<md-fab-speed-dial class="md-fling" md-direction="{{mdDirection || \'left\'}}">' +
+        '<md-fab-trigger>' +
+          '<md-button aria-label="{{label}}" class="md-fab">' +
+            '<md-icon md-font-library="material-icons">{{current.icon}}</md-icon>' +
+            '<md-tooltip md-delay="500">{{label}}</md-tooltip>' +
+          '</md-button>' +
+        '</md-fab-trigger>' +
+        '<md-fab-actions>' +
+          '<div ng-repeat="mode in travelTypeFabCtrl.travelTypes">' +
+            '<md-button ng-click="travelTypeFabCtrl.select(mode.mode)" aria-label="{{mode.name}}" class="md-fab md-mini">' +
+              '<md-icon md-font-library="material-icons">{{mode.icon}}</md-icon>' +
+              '<md-tooltip md-delay="500">{{mode.name}}</md-tooltip>' +
+            '</md-button>' +
+          '</div>' +
+        '</md-fab-actions>' +
+      '</md-fab-speed-dial>'      
+      
+
+      $templateCache.put('travelTypeFab.tpl', tpl);
+  });
+
 /**
  * Route 360 for Angular
  * https://github.com/route360/r360-angular
