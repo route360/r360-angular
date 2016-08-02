@@ -100,13 +100,14 @@ angular.module('ng360')
          * @param  Object coords Latlng coordinates to bias the results
          * @return Promise       Promise returns top 5 matches
          */
-        function geocode(query,coords) {
+        function geocode(query,coords,lang) {
 
             var results = [];
             var deferred = $q.defer();
 
             var url = "https://service.route360.net/geocode/api/?q=" + query + "&limit=5";
             if (angular.isDefined(coords)) url += "&lat=" + coords.lat + "&lon=" + coords.lng;
+            if (angular.isDefined(lang)) url += "&lang=" + lang;
 
             $http({
                 method: 'GET',
@@ -145,6 +146,8 @@ angular.module('ng360')
 
             if (typeof coords[0] != 'undefined' && typeof coords[1] != 'undefined')
                 url = "https://service.route360.net/geocode/reverse?lon=" + coords[1] + "&lat=" + coords[0];
+
+            if (angular.isDefined(lang)) url += "&lang=" + lang;
 
             $http({
                 method: 'GET',
