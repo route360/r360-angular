@@ -8,7 +8,7 @@ angular.module('ng360')
       if (angular.isDefined($scope.placeChanged) && angular.isDefined(item) ) $scope.placeChanged({item: item});
     }
 
-    vm.lang               = angular.isDefined($scope.lang) ? $scope.lang : 'en';
+    vm.langCode               = angular.isDefined($scope.langCode) ? $scope.langCode : 'en';
     vm.placeholder        = angular.isDefined($scope.placeholder) ? $scope.placeholder : 'Search...';
     vm.geocode            = R360Util.geocode;
     vm.selectedItemChange = selectedItemChange;

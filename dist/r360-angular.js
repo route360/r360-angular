@@ -697,7 +697,7 @@ angular.module('ng360')
       if (angular.isDefined($scope.placeChanged) && angular.isDefined(item) ) $scope.placeChanged({item: item});
     }
 
-    vm.lang               = angular.isDefined($scope.lang) ? $scope.lang : 'en';
+    vm.langCode               = angular.isDefined($scope.langCode) ? $scope.langCode : 'en';
     vm.placeholder        = angular.isDefined($scope.placeholder) ? $scope.placeholder : 'Search...';
     vm.geocode            = R360Util.geocode;
     vm.selectedItemChange = selectedItemChange;
@@ -723,7 +723,7 @@ angular.module('ng360')
         placeholder: '@',
         placeChanged: '&',
         searchText: '=',
-        lang:'&'
+        langCode:'&'
       }
     };
   });
@@ -735,7 +735,7 @@ angular.module('ng360')
               md-selected-item='selectedPlace'\
               md-search-text='searchText'\
               md-selected-item-change='geocoderCtrl.selectedItemChange(item)'\
-              md-items='item in geocoderCtrl.geocode(searchText,bias,eocoderCtrl.lang)'\
+              md-items='item in geocoderCtrl.geocode(searchText,bias,langCode)'\
               md-item-text='item.description.full'\
               md-min-length='3'\
               placeholder='{{placeholder}}'\

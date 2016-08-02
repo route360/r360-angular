@@ -17,7 +17,7 @@ angular.module('ng360')
         placeholder: '@',
         placeChanged: '&',
         searchText: '=',
-        lang:'&'
+        langCode:'&'
       }
     };
   });
