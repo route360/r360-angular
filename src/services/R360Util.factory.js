@@ -135,7 +135,7 @@ angular.module('ng360')
          * @param  Object coords Latlng coordinates
          * @return Promise       Promise returns the best match
          */
-        function reverseGeocode(coords,geojson) {
+        function reverseGeocode(coords,geojson,lang) {
 
             var url = "";
 

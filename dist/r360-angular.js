@@ -697,10 +697,10 @@ angular.module('ng360')
       if (angular.isDefined($scope.placeChanged) && angular.isDefined(item) ) $scope.placeChanged({item: item});
     }
 
+    vm.lang               = angular.isDefined($scope.lang) ? $scope.lang : 'en';
     vm.placeholder        = angular.isDefined($scope.placeholder) ? $scope.placeholder : 'Search...';
     vm.geocode            = R360Util.geocode;
     vm.selectedItemChange = selectedItemChange;
-    
 
   }])
 
@@ -735,7 +735,7 @@ angular.module('ng360')
               md-selected-item='selectedPlace'\
               md-search-text='searchText'\
               md-selected-item-change='geocoderCtrl.selectedItemChange(item)'\
-              md-items='item in geocoderCtrl.geocode(searchText,bias,lang)'\
+              md-items='item in geocoderCtrl.geocode(searchText,bias,eocoderCtrl.lang)'\
               md-item-text='item.description.full'\
               md-min-length='3'\
               placeholder='{{placeholder}}'\
@@ -1191,7 +1191,7 @@ angular.module('ng360')
          * @param  Object coords Latlng coordinates
          * @return Promise       Promise returns the best match
          */
-        function reverseGeocode(coords,geojson) {
+        function reverseGeocode(coords,geojson,lang) {
 
             var url = "";
 
