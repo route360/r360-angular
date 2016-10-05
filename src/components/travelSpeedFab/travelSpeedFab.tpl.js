@@ -5,20 +5,18 @@ angular.module('ng360')
       '<md-fab-speed-dial class="{{mdAnimation || \'md-fling\'}}" md-direction="{{mdDirection || \'left\'}}">' +
         '<md-fab-trigger>' +
           '<md-button aria-label="{{label}}" class="md-fab">' +
-            '<md-icon md-font-set="material-icons">{{current.icon}}</md-icon>' +
+            '{{current.label}}' +
             '<md-tooltip md-delay="500">{{label}}</md-tooltip>' +
           '</md-button>' +
         '</md-fab-trigger>' +
         '<md-fab-actions>' +
-          '<div ng-repeat="mode in travelTypeFabCtrl.travelTypes">' +
-            '<md-button ng-click="travelTypeFabCtrl.select(mode.mode)" aria-label="{{mode.name}}" class="md-fab md-mini">' +
-              '<md-icon md-font-set="material-icons">{{mode.icon}}</md-icon>' +
-              '<md-tooltip md-delay="500">{{mode.name}}</md-tooltip>' +
+          '<div ng-repeat="speed in travelSpeedFabCtrl.travelSpeeds">' +
+            '<md-button ng-click="travelSpeedFabCtrl.changeTravelSpeed(speed)" aria-label="{{speed.label}}" class="md-fab md-mini medium" style="font-size: 11px">' +
+              '{{::(speed.label)}}' +
             '</md-button>' +
           '</div>' +
         '</md-fab-actions>' +
       '</md-fab-speed-dial>';
 
-
-      $templateCache.put('travelTypeFab.tpl', tpl);
+      $templateCache.put('travelSpeedFab.tpl', tpl);
   });

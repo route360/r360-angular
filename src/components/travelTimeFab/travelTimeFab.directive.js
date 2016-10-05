@@ -9,6 +9,7 @@ angular.module('ng360')
         travelTimeRange: '=',
         travelTimeValues: '=',
         mdDirection: '@',
+        mdAnimation: '@',
         label: '@'
       },
       templateUrl: 'travelTimeFab.tpl',

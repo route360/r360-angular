@@ -22,6 +22,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-ng-constant');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-ng-annotate');
 
 
   /**
@@ -145,6 +146,11 @@ module.exports = function(grunt) {
         },
         production: {
         }
+      },
+
+      ngAnnotate: {
+          options: {
+          },
       },
       jshint: {
         options: {

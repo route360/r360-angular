@@ -7,6 +7,7 @@ angular.module('ng360')
         model: '=',
         travelTypes: '=',
         mdDirection: '@',
+        mdAnimation: '@',
         label: '@'
       },
       templateUrl: 'travelTypeFab.tpl',
