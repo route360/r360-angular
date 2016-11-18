@@ -614,6 +614,7 @@ angular.module('ng360')
         url += "&location=" + latlng.lat + "," + latlng.lng;
       }
       if (angular.isDefined($scope.distance)) url += "&distance=" + $scope.distance;
+      if (angular.isDefined($scope.country)) url += "&countryCode=" + $scope.country;
 
       $http({
           method: 'GET',
@@ -653,6 +654,7 @@ angular.module('ng360')
       scope: {
         selectedPlace: '=',
         placeholder: '@',
+        country: '@',
         latlng: '=',
         distance: '=',
         placeChanged: '&',

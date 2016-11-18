@@ -14,6 +14,7 @@ angular.module('ng360')
       scope: {
         selectedPlace: '=',
         placeholder: '@',
+        country: '@',
         latlng: '=',
         distance: '=',
         placeChanged: '&',
