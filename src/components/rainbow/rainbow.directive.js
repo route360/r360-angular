@@ -14,7 +14,8 @@ angular.module('ng360')
       scope: {
         travelTime: '=',
         travelTimeRange: '=',
-        colorRange: '='
+        colorRange: '=',
+        label: '@'
       }
     };
   })
