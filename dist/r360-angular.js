@@ -831,7 +831,7 @@ angular.module('ng360')
   .run(function ($templateCache){
 
       var tpl = "<md-whiteframe class='md-whiteframe-z2' flex layout layout-align='center center'>\
-          <label ng-repeat='tt in travelTimeRange.times' ng-if='travelTime >= tt && colorRange.colors.length > 1' flex ng-style='{background: colorRange.colors[$index]}'>\
+          <label ng-repeat='tt in (travelTimeRange.labels || travelTimeRange.times)' ng-if='travelTime >= tt && colorRange.colors.length > 1' flex ng-style='{background: colorRange.colors[$index]}'>\
             {{tt}} {{label || 'Min'}}\
           </label>\
           <label ng-if='colorRange.colors.length == 1' flex style='background: {{colorRange.colors[0]}}'>\
@@ -932,14 +932,30 @@ angular.module('ng360')
 angular.module('ng360')
   .controller('TravelDistanceFabCtrl', ['$scope', function($scope) {
     this.select = function(value) {
-      $scope.model = value;
+      $scope.model = value.time;
+      $scope.selected = value;
     }
+
+    $scope.$watch('travelDistanceRange', function() {
+      if ($scope.travelDistanceRange) {
+        var labels = $scope.travelDistanceRange.labels || []
+        $scope.travelDistanceItems = $scope.travelDistanceRange.times
+                                  .map(function(time, i) {return {time: time, label: labels[i] || time}});
+
+        $scope.selected = $scope.travelDistanceItems.filter(function(item) {return item.time == $scope.model})[0];
+      }
+    })
 
     $scope.$watch('model', function() {
       if ($scope.model && $scope.travelDistanceValues) {
         $scope.travelDistanceValues = $scope.travelDistanceRange.times
                                   .filter(function(time) {return time <= $scope.model})
                                   .map(function(time) {return time});
+
+      }
+
+      if ($scope.model && $scope.travelDistanceItems) {
+        $scope.selected = $scope.travelDistanceItems.filter(function(item) {return item.time == $scope.model})[0];
       }
     })
   }]);
@@ -970,13 +986,13 @@ angular.module('ng360')
         '<md-fab-speed-dial class="{{mdAnimation || \'md-fling\'}}" md-direction="{{mdDirection || \'left\'}}">' +
           '<md-fab-trigger>' +
             '<md-button aria-label="{{label}}" class="md-fab">' +
-              '{{model && model || 0}} {{unitLabel || "m"}}' +
+              '{{selected && selected.label || 0}} {{unitLabel || "m"}}' +
               '<md-tooltip md-delay="500">{{label}}</md-tooltip>' +
             '</md-button>' +
           '</md-fab-trigger>' +
           '<md-fab-actions>' +
-              '<md-button ng-repeat="time in travelDistanceRange.times | orderBy:$index:true " ng-click="travelDistanceFabCtrl.select(time)" aria-label="{{label}} {{time}}" class="md-fab md-mini" ng-style="{background: colorRange.colors[5 - $index]}">' +
-                '{{time}}' +
+              '<md-button ng-repeat="item in travelDistanceItems | orderBy:$index:true " ng-click="travelDistanceFabCtrl.select(item)" aria-label="{{label}} {{item.label}}" class="md-fab md-mini" ng-style="{background: colorRange.colors[5 - $index]}">' +
+                '{{item.label}}' +
               '</md-button>' +
           '</md-fab-actions>' +
         '</md-fab-speed-dial>';
