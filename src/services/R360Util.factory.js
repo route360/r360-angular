@@ -105,6 +105,22 @@ angular.module('ng360')
             var results = [];
             var deferred = $q.defer();
 
+            // regex direct latlng input
+            var matches = query.match(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/g);
+
+            if (matches && matches.length > 0) return Promise.resolve([{
+                geometry : {
+                    coordinates : [
+                        parseFloat(query.split(",")[1]),
+                        parseFloat(query.split(",")[0])
+                    ]
+                },
+                properties : {
+                    name : query
+                },
+                description : buildPlaceDescription({ name : query })
+            }]);
+
             var url = "https://service.route360.net/geocode/api/?q=" + query + "&limit=5";
             if (angular.isDefined(coords)) url += "&lat=" + coords.lat + "&lon=" + coords.lng;
             if (angular.isDefined(lang)) url += "&lang=" + lang;
