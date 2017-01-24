@@ -121,7 +121,7 @@ angular.module('ng360')
                 description : buildPlaceDescription({ name : query })
             }]);
 
-            var url = "https://service.route360.net/geocode/api/?q=" + query + "&limit=5";
+            var url = "https://service.route360.net/geocode/api/?q=" + encodeURIComponent(query) + "&limit=5";
             if (angular.isDefined(coords)) url += "&lat=" + coords.lat + "&lon=" + coords.lng;
             if (angular.isDefined(lang)) url += "&lang=" + lang;
 

@@ -8,9 +8,9 @@ angular.module('ng360')
 
       if(!angular.isDefined(item)) return;
 
-      var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + item.magicKey + "&text=" + item.text;
+      var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=" + encodeURIComponent(item.magicKey) + "&text=" + encodeURIComponent(item.text);
 
-      if (angular.isDefined($scope.token)) url += "&forStorage=true&token=" + $scope.token;
+      if (angular.isDefined($scope.token)) url += "&forStorage=true&token=" + encodeURIComponent($scope.token);
 
       $http({
           method: 'GET',
@@ -29,7 +29,7 @@ angular.module('ng360')
       var results = [];
       var deferred = $q.defer();
 
-      var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?f=json&text=" + text;
+      var url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?f=json&text=" + encodeURIComponent(text);
       if (angular.isDefined($scope.latlng)) {
         var latlng = R360Util.normalizeLatLng($scope.latlng);
         url += "&location=" + latlng.lat + "," + latlng.lng;
