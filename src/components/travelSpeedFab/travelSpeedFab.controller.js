@@ -27,7 +27,7 @@ angular.module('ng360')
 
     $scope.$watch('model', function() {
       for (var i = 0; i < vm.travelSpeeds.length; i++) {
-        if (vm.travelSpeeds[i].value == $scope.model) {
+        if (vm.travelSpeeds[i].value === $scope.model) {
           $scope.current = vm.travelSpeeds[i];
         }
       }
