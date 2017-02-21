@@ -1,11 +1,30 @@
 angular.module('ng360')
-  .controller('EsriGeocoderCtrl', ['$scope', '$timeout', '$attrs', '$q', '$http', 'R360Util', function($scope, $timeout, $attrs, $q, $http, R360Util) {
+  .controller('EsriGeocoderCtrl', ['$scope', '$timeout', '$attrs', '$q', '$http', 'R360Util', function ($scope, $timeout, $attrs, $q, $http, R360Util) {
 
     var vm = this;
 
     function selectedItemChange(item) {
 
       if (!angular.isDefined(item)) return;
+
+      // regex direct latlng input
+      var matches = item.text.match(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/g);
+
+      if (matches && matches.length > 0) {
+        if (angular.isDefined($scope.placeChanged)) $scope.placeChanged([{
+          geometry: {
+            coordinates: {
+              x: parseFloat(item.text.split(',')[1]),
+              y: parseFloat(item.text.split(',')[0])
+            }
+          },
+          properties: {
+            name: item.text
+          },
+          name: item.text,
+          text: item.text
+        }])
+      };
 
       var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=json&magicKey=' + encodeURIComponent(item.magicKey) + '&text=' + encodeURIComponent(item.text);
 
@@ -14,11 +33,13 @@ angular.module('ng360')
       $http({
         method: 'GET',
         url: url
-      }).then(function(response) {
+      }).then(function (response) {
 
-        if (angular.isDefined($scope.placeChanged) && angular.isDefined(response)) $scope.placeChanged({ item: response.data.locations[0] });
+        if (angular.isDefined($scope.placeChanged) && angular.isDefined(response)) $scope.placeChanged({
+          item: response.data.locations[0]
+        });
 
-      }, function(response) {
+      }, function (response) {
         console.log(response);
       });
     }
@@ -27,6 +48,13 @@ angular.module('ng360')
 
       var results = [];
       var deferred = $q.defer();
+
+      // regex direct latlng input
+      var matches = text.match(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/g);
+
+      if (matches && matches.length > 0) return Promise.resolve([{
+        text: text
+      }]);
 
       var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?f=json&text=' + encodeURIComponent(text);
       if (angular.isDefined($scope.latlng)) {
@@ -39,13 +67,13 @@ angular.module('ng360')
       $http({
         method: 'GET',
         url: url
-      }).then(function(response) {
+      }).then(function (response) {
 
         if (!angular.isDefined(response.data.suggestions)) deferred.reject('no result');;
 
         deferred.resolve(response.data.suggestions);
 
-      }, function(response) {
+      }, function (response) {
         console.log(response);
       });
       return deferred.promise;
